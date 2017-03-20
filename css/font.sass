@@ -1,0 +1,26 @@
+@mixin font-typography($size, $line-height, $tracking, $weight)
+	font-size: $size * 12 / 11
+	line-height: $line-height * 12 / 11
+	letter-spacing: $tracking / 1000
+	font-weight: $weight
+
+@mixin font-normal-body
+	@include font-typography(16px, 21px, -20em, 400)
+
+@mixin font-normal-h2
+	@include font-typography(21px, 28px, 17em, 400)
+
+@mixin font-normal-h3
+	@include font-typography(19px, 23px, -26em, 400)
+
+@mixin font-small-body
+	@include font-typography(15px, 20px, -16em, 400)
+
+@mixin font-normal-caption
+	@include font-typography(11px, 13px, -6em, 400)
+
+@mixin font-large-body
+	@include font-typography(17px, 22px, -24em, 400)
+
+@mixin font-x-large-body
+	@include font-typography(19px, 24px, -26em, 400)
