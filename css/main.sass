@@ -1,4 +1,4 @@
-﻿@import "reset.scss"
+@import "reset.scss"
 @import "color.sass"
 @import "font.sass"
 
@@ -17,10 +17,9 @@
 
 $scroll-bar-width: 17px
 $main-width: 1024px - $scroll-bar-width
-$my-font-family: 'Helvetica Neue', Helvetica, Arial, '微軟正黑體', sans-serif
 
-input, button
-	font-family: $my-font-family
+body, input, button
+	font-family: 'Helvetica Neue', Helvetica, Arial, '微軟正黑體', sans-serif
 
 header
 	@include font-typography(16px, 21px, 0em, 600)
@@ -31,7 +30,7 @@ body
 	width: 100%
 	background-color: rgb(250,250,250)
 	color: #333
-	font-family: $my-font-family
+	
 	@include font-normal-body
 
 main

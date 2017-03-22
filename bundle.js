@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 14);
+/******/ 	return __webpack_require__(__webpack_require__.s = 15);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -191,15 +191,15 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _AppStore = __webpack_require__(6);
+var _AppStore = __webpack_require__(7);
 
 var _AppStore2 = _interopRequireDefault(_AppStore);
 
-var _RouterStore = __webpack_require__(8);
+var _RouterStore = __webpack_require__(9);
 
 var _RouterStore2 = _interopRequireDefault(_RouterStore);
 
-var _FrequencyStore = __webpack_require__(7);
+var _FrequencyStore = __webpack_require__(8);
 
 var _FrequencyStore2 = _interopRequireDefault(_FrequencyStore);
 
@@ -268,11 +268,11 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _StatePage = __webpack_require__(12);
+var _StatePage = __webpack_require__(13);
 
 var _StatePage2 = _interopRequireDefault(_StatePage);
 
-var _FrequencyPage = __webpack_require__(11);
+var _FrequencyPage = __webpack_require__(12);
 
 var _FrequencyPage2 = _interopRequireDefault(_FrequencyPage);
 
@@ -376,10 +376,16 @@ function DirectoryInput(props) {
 /* 5 */
 /***/ (function(module, exports) {
 
-module.exports = ReactDOM;
+// removed by extract-text-webpack-plugin
 
 /***/ }),
 /* 6 */
+/***/ (function(module, exports) {
+
+module.exports = ReactDOM;
+
+/***/ }),
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -389,11 +395,11 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _TextEntity = __webpack_require__(10);
+var _TextEntity = __webpack_require__(11);
 
 var _TextEntity2 = _interopRequireDefault(_TextEntity);
 
-var _TagDict = __webpack_require__(9);
+var _TagDict = __webpack_require__(10);
 
 var _TagDict2 = _interopRequireDefault(_TagDict);
 
@@ -473,7 +479,7 @@ function read_file(file, target) {
 }
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -712,7 +718,7 @@ function getChartDataObject(source, tags, string) {
 }
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -740,7 +746,7 @@ function RouterStore(target, action) {
 exports.default = RouterStore;
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -793,7 +799,7 @@ var TagDict = function () {
 exports.default = TagDict;
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -833,7 +839,7 @@ var TextEntity = function () {
 exports.default = TextEntity;
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -847,7 +853,7 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactChartjs = __webpack_require__(13);
+var _reactChartjs = __webpack_require__(14);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1023,7 +1029,7 @@ function InputArea(props) {
 }
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1109,13 +1115,13 @@ function DirectoryMetadata(props) {
 }
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports) {
 
 module.exports = reactChartjs2;
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1123,11 +1129,13 @@ module.exports = reactChartjs2;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+__webpack_require__(5);
+
 var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactDom = __webpack_require__(5);
+var _reactDom = __webpack_require__(6);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
