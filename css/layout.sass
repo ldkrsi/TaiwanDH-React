@@ -1,0 +1,94 @@
+$scroll-bar-width: 17px
+$main-width: 1024px - $scroll-bar-width
+
+nav, div[data-reactroot] > div > div, h1, h2
+	padding-bottom: 15px
+
+body
+	@include font-normal-body
+	width: 100%
+	background-color: rgb(250,250,250)
+	color: #333
+
+header
+	@include font-normal-h4
+	color: #888
+	padding: 10px
+		
+main
+	display: block
+	background-color: #fff
+	width: $main-width
+	min-height: 768px
+	box-sizing: border-box
+
+.container
+	@include clear-both
+	padding: 15px
+	display: block
+
+nav > ul
+	display: flex
+	border-width: 1px
+	border-style: solid
+	border-radius: 4px
+	&.disable
+		@include grey-border
+		@include grey
+	&.enable
+		@include blue-border
+		@include blue
+		& > li
+			cursor: pointer
+			&.active
+				cursor: auto
+				@include white
+				@include blue-bg
+	& > li
+		flex: 1
+		padding: 2px
+		text-align: center
+		border-right-width: 1px
+		border-right-style: solid
+		border-color: inherit
+	& > li:last-child
+		border: 0
+
+h2
+	@include font-normal-h2
+
+h3
+	@include font-normal-h3
+
+p
+	padding-bottom: 10px
+
+dl
+	dt
+		@include font-normal-caption
+		@include black
+		padding-bottom: 2px
+	dd
+		padding-bottom: 15px
+
+button
+	@include font-normal-body
+	border-width: 1px
+	border-style: solid
+	border-radius: 4px
+	text-align: center
+	padding: 2px 9px
+	min-width: 66px
+	@include blue
+	@include blue-border
+	&:hover, &:active
+		@include white
+		@include blue-bg
+
+input[type=text]
+	@include font-normal-body
+	border: 0
+	background-color: rgba(240,240,240,0.9)
+	padding: 3px 9px
+	margin-right: 15px
+	width: 250px
