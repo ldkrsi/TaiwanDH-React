@@ -19,7 +19,10 @@ class Dispatcher{
 	}
 	dispatch(command){
 		for(let store of this.stores){
-			store(this.component, command)
+			if(!(command.type in store)){
+				continue;
+			}
+			store[command.type](command.payload, this.component.state, this.component);
 		}
 	}
 }

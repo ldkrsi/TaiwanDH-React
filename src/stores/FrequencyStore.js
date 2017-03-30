@@ -1,60 +1,58 @@
-function FrequencyStore(target, action){
-	let query = target.state.query;
-	let result = target.state.result;
-	switch(action.type){
-		case 'FrequencyTyping':
-			query.typing = action.payload;
-			target.setState({query: query});
+const FrequencyStore = {
+	FrequencyTyping: function(payload, state, target){
+		let query = state.query;
+		query.typing = payload;
+		target.setState({query: query});
+	},
+	FrequencyRemove: function(payload, state, target){
+		let query = state.query;
+		let result = state.result;
+		query.done.delete(payload);
+		delete result.totals[payload];
+		for(let item of result.drawData){
+			item.datasets = item.datasets.filter(function(row, i){
+				if(row.myID !== payload){
+					return false;
+				}
+				return true;
+			});
+		}
+		result.csvBlob = toCSV(result.totals, result.drawData);
+		target.setState({
+			query: query,
+			result: result
+		});
+	},
+	FrequencySubmit: function(payload, state, target){
+		let query = state.query;
+		let result = state.result;
+		let term = query.typing.trim();
+		if(term.length === 0){
 			return;
-		case 'FrequencyRemove':
-			let s = action.payload;
-			query.done.delete(s);
-			delete result.totals[s];
-			for(let item of result.drawData){
-				item.datasets = item.datasets.filter(function(row, i){
-					if(row.myID !== s){
-						return false;
-					}
-					return true;
+		}
+		let drawData = result.drawData;
+		let count_result = occurrencesCounter(state.database, term);
+		query.typing = '';
+		query.done.add(term);
+		result.totals[term] = count_result.counter;
+		count_result.result.forEach(function(row, i){
+			let tags = state.directoryMetadata.tags[i];
+			if(!(i in drawData)){
+				drawData.push({
+					labels: tags.keys(),
+					datasets: []
 				});
 			}
-			result.csvBlob = toCSV(result.totals, result.drawData);
-			target.setState({
-				query: query,
-				result: result
-			});
-			return;
-		case 'FrequencySubmit':
-			let term = query.typing.trim();
-			if(term.length === 0){
-				return;
-			}
-			let state = target.state, drawData = result.drawData;
-			let count_result = occurrencesCounter(state.database, term);
-			query.typing = '';
-			query.done.add(term);
-			result.totals[term] = count_result.counter;
-			count_result.result.map(function(row, i){
-				let tags = state.directoryMetadata.tags[i];
-				if(!(i in drawData)){
-					drawData.push({
-						labels: tags.keys(),
-						datasets: []
-					});
-				}
-				Array.prototype.push.apply(drawData[i].datasets, getChartDataObject(row, tags, term));
-			});
-			result.csvBlob = toCSV(result.totals, drawData);
-			target.setState({
-				query: query,
-				result: result
-			});
-			return;
-		default:
-			return;
+			Array.prototype.push.apply(drawData[i].datasets, getChartDataObject(row, tags, term));
+		});
+		result.csvBlob = toCSV(result.totals, drawData);
+		target.setState({
+			query: query,
+			result: result
+		});
 	}
-	
-}
+};
+
 export default FrequencyStore;
 
 function toCSV(totals, drawData){
@@ -98,7 +96,7 @@ function occurrencesCounter(texts, string){
 	let result = [], counter = 0;
 	for(let text of texts){
 		let c = text.occurrences(string);
-		text.metadata.tags.map(function(tag, i){
+		text.metadata.tags.forEach(function(tag, i){
 			if(!(i in result)){
 				result.push({});
 			}
@@ -126,7 +124,9 @@ function getChartDataObject(source, tags, string){
 	let data2 = tags.keys().map(function(t){
 		return Math.round(source[t]/tags.value(t)*100)/100;
 	});
-	let color = colors[0].map(function(x){return x.toString();}).join(',');
+	let color = colors[0].map(function(x){
+		return x.toString();
+	}).join(',');
 	colors.push(colors.shift());
 	return [
 		{

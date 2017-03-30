@@ -1,15 +1,15 @@
 function getActions(dispatcher){
 	return {
-		InputDirChange: function(e){
-			dispatcher.dispatch({
-				type: 'InputDirChange',
-				payload: e
-			});
-		},
 		PageChange: function(url){
 			dispatcher.dispatch({
 				type: 'PageChange',
 				payload: url
+			});
+		},
+		InputDirChange: function(e){
+			dispatcher.dispatch({
+				type: 'InputDirChange',
+				payload: e
 			});
 		},
 		FrequencyTyping: function(query){

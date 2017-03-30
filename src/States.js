@@ -16,33 +16,32 @@ const myState = {
 	PageState: function(url){
 		return {
 			url: url,
-			query: queryDispatcher(url),
-			result: resultDispatcher(url)
+			query: selector(url, queryMap),
+			result: selector(url, resultMap)
 		};
 	}
 }
 export default myState;
-
-function queryDispatcher(url){
-	switch(url){
-		case 'frequency':
-			return {
-				typing: '',
-				done: new Set()
-			};
-		default:
-			return null;
-	};
-}
-function resultDispatcher(url){
-	switch(url){
-		case 'frequency':
-			return {
-				totals: {},
-				csvBlob: null,
-				drawData: []
-			};
-		default:
-			return null;
-	};
+const queryMap = {
+	frequency: function(){
+		return {
+			typing: '',
+			done: new Set()
+		};
+	}
+};
+const resultMap = {
+	frequency: function(){
+		return {
+			totals: {},
+			csvBlob: null,
+			drawData: []
+		};
+	}
+};
+function selector(url, dict){
+	if(!(url in dict)){
+		return null;
+	}
+	return dict[url]();
 }

@@ -1,12 +1,8 @@
 import myState from "../States";
 
-function RouterStore(target, action){
-	switch(action.type){
-		case 'PageChange':
-			target.setState(myState.PageState(action.payload));
-			break;
-		default:
-			break;
+const RouterStore = {
+	PageChange: function(payload, state, target){
+		target.setState(myState.PageState(payload));
 	}
-}
+};
 export default RouterStore;

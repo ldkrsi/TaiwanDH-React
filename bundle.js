@@ -100,36 +100,35 @@ var myState = {
 	PageState: function PageState(url) {
 		return {
 			url: url,
-			query: queryDispatcher(url),
-			result: resultDispatcher(url)
+			query: selector(url, queryMap),
+			result: selector(url, resultMap)
 		};
 	}
 };
 exports.default = myState;
 
-
-function queryDispatcher(url) {
-	switch (url) {
-		case 'frequency':
-			return {
-				typing: '',
-				done: new Set()
-			};
-		default:
-			return null;
-	};
-}
-function resultDispatcher(url) {
-	switch (url) {
-		case 'frequency':
-			return {
-				totals: {},
-				csvBlob: null,
-				drawData: []
-			};
-		default:
-			return null;
-	};
+var queryMap = {
+	frequency: function frequency() {
+		return {
+			typing: '',
+			done: new Set()
+		};
+	}
+};
+var resultMap = {
+	frequency: function frequency() {
+		return {
+			totals: {},
+			csvBlob: null,
+			drawData: []
+		};
+	}
+};
+function selector(url, dict) {
+	if (!(url in dict)) {
+		return null;
+	}
+	return dict[url]();
 }
 
 /***/ }),
@@ -144,16 +143,16 @@ Object.defineProperty(exports, "__esModule", {
 });
 function getActions(dispatcher) {
 	return {
-		InputDirChange: function InputDirChange(e) {
-			dispatcher.dispatch({
-				type: 'InputDirChange',
-				payload: e
-			});
-		},
 		PageChange: function PageChange(url) {
 			dispatcher.dispatch({
 				type: 'PageChange',
 				payload: url
+			});
+		},
+		InputDirChange: function InputDirChange(e) {
+			dispatcher.dispatch({
+				type: 'InputDirChange',
+				payload: e
 			});
 		},
 		FrequencyTyping: function FrequencyTyping(query) {
@@ -231,7 +230,10 @@ var Dispatcher = function () {
 				for (var _iterator = this.stores[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
 					var store = _step.value;
 
-					store(this.component, command);
+					if (!(command.type in store)) {
+						continue;
+					}
+					store[command.type](command.payload, this.component.state, this.component);
 				}
 			} catch (err) {
 				_didIteratorError = true;
@@ -405,67 +407,60 @@ var _TagDict2 = _interopRequireDefault(_TagDict);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function AppStore(target, action) {
-	(function () {
-		switch (action.type) {
-			case 'InputDirChange':
-				target.setState({ database: [] });
-				var files = action.payload.target.files;
-				var counter = 0,
-				    deep = 0,
-				    tags = [];
-				var _iteratorNormalCompletion = true;
-				var _didIteratorError = false;
-				var _iteratorError = undefined;
+var AppStore = {
+	InputDirChange: function InputDirChange(payload, state, target) {
+		target.setState({ database: [] });
+		var files = payload.target.files;
+		var counter = 0,
+		    deep = 0,
+		    tags = [];
+		var _iteratorNormalCompletion = true;
+		var _didIteratorError = false;
+		var _iteratorError = undefined;
 
-				try {
-					for (var _iterator = files[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-						var f = _step.value;
+		try {
+			for (var _iterator = files[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+				var f = _step.value;
 
-						if (f.type !== 'text/plain') {
-							continue;
-						}
-						read_file(f, target);
-						counter += 1;
-						deep = Math.max(deep, f.webkitRelativePath.split("/").length - 2);
-						f.webkitRelativePath.split("/").slice(1, -1).map(function (item, i) {
-							if (tags.length <= i) {
-								tags.push(new _TagDict2.default());
-							}
-							tags[i].add(item);
-						});
-					}
-				} catch (err) {
-					_didIteratorError = true;
-					_iteratorError = err;
-				} finally {
-					try {
-						if (!_iteratorNormalCompletion && _iterator.return) {
-							_iterator.return();
-						}
-					} finally {
-						if (_didIteratorError) {
-							throw _iteratorError;
-						}
-					}
+				if (f.type !== 'text/plain') {
+					continue;
 				}
-
-				target.setState({
-					directoryMetadata: {
-						name: files[0].webkitRelativePath.split("/")[0],
-						textCount: counter,
-						deep: deep,
-						tags: tags
+				read_file(f, target);
+				counter += 1;
+				deep = Math.max(deep, f.webkitRelativePath.split("/").length - 2);
+				f.webkitRelativePath.split("/").slice(1, -1).forEach(function (item, i) {
+					if (tags.length <= i) {
+						tags.push(new _TagDict2.default());
 					}
+					tags[i].add(item);
 				});
-				break;
-			default:
-				break;
+			}
+		} catch (err) {
+			_didIteratorError = true;
+			_iteratorError = err;
+		} finally {
+			try {
+				if (!_iteratorNormalCompletion && _iterator.return) {
+					_iterator.return();
+				}
+			} finally {
+				if (_didIteratorError) {
+					throw _iteratorError;
+				}
+			}
 		}
-	})();
 
-	;
-}
+		target.setState({
+			directoryMetadata: {
+				name: files[0].webkitRelativePath.split("/")[0],
+				textCount: counter,
+				deep: deep,
+				tags: tags
+			}
+		});
+	}
+};
+
 exports.default = AppStore;
 
 
@@ -488,103 +483,83 @@ function read_file(file, target) {
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
+var FrequencyStore = {
+	FrequencyTyping: function FrequencyTyping(payload, state, target) {
+		var query = state.query;
+		query.typing = payload;
+		target.setState({ query: query });
+	},
+	FrequencyRemove: function FrequencyRemove(payload, state, target) {
+		var query = state.query;
+		var result = state.result;
+		query.done.delete(payload);
+		delete result.totals[payload];
+		var _iteratorNormalCompletion = true;
+		var _didIteratorError = false;
+		var _iteratorError = undefined;
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+		try {
+			for (var _iterator = result.drawData[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+				var item = _step.value;
 
-function FrequencyStore(target, action) {
-	var query = target.state.query;
-	var result = target.state.result;
-
-	var _ret = function () {
-		switch (action.type) {
-			case 'FrequencyTyping':
-				query.typing = action.payload;
-				target.setState({ query: query });
-				return {
-					v: void 0
-				};
-			case 'FrequencyRemove':
-				var s = action.payload;
-				query.done.delete(s);
-				delete result.totals[s];
-				var _iteratorNormalCompletion = true;
-				var _didIteratorError = false;
-				var _iteratorError = undefined;
-
-				try {
-					for (var _iterator = result.drawData[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-						var item = _step.value;
-
-						item.datasets = item.datasets.filter(function (row, i) {
-							if (row.myID !== s) {
-								return false;
-							}
-							return true;
-						});
+				item.datasets = item.datasets.filter(function (row, i) {
+					if (row.myID !== payload) {
+						return false;
 					}
-				} catch (err) {
-					_didIteratorError = true;
-					_iteratorError = err;
-				} finally {
-					try {
-						if (!_iteratorNormalCompletion && _iterator.return) {
-							_iterator.return();
-						}
-					} finally {
-						if (_didIteratorError) {
-							throw _iteratorError;
-						}
-					}
+					return true;
+				});
+			}
+		} catch (err) {
+			_didIteratorError = true;
+			_iteratorError = err;
+		} finally {
+			try {
+				if (!_iteratorNormalCompletion && _iterator.return) {
+					_iterator.return();
 				}
-
-				result.csvBlob = toCSV(result.totals, result.drawData);
-				target.setState({
-					query: query,
-					result: result
-				});
-				return {
-					v: void 0
-				};
-			case 'FrequencySubmit':
-				var term = query.typing.trim();
-				if (term.length === 0) {
-					return {
-						v: void 0
-					};
+			} finally {
+				if (_didIteratorError) {
+					throw _iteratorError;
 				}
-				var state = target.state,
-				    drawData = result.drawData;
-				var count_result = occurrencesCounter(state.database, term);
-				query.typing = '';
-				query.done.add(term);
-				result.totals[term] = count_result.counter;
-				count_result.result.map(function (row, i) {
-					var tags = state.directoryMetadata.tags[i];
-					if (!(i in drawData)) {
-						drawData.push({
-							labels: tags.keys(),
-							datasets: []
-						});
-					}
-					Array.prototype.push.apply(drawData[i].datasets, getChartDataObject(row, tags, term));
-				});
-				result.csvBlob = toCSV(result.totals, drawData);
-				target.setState({
-					query: query,
-					result: result
-				});
-				return {
-					v: void 0
-				};
-			default:
-				return {
-					v: void 0
-				};
+			}
 		}
-	}();
 
-	if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
-}
+		result.csvBlob = toCSV(result.totals, result.drawData);
+		target.setState({
+			query: query,
+			result: result
+		});
+	},
+	FrequencySubmit: function FrequencySubmit(payload, state, target) {
+		var query = state.query;
+		var result = state.result;
+		var term = query.typing.trim();
+		if (term.length === 0) {
+			return;
+		}
+		var drawData = result.drawData;
+		var count_result = occurrencesCounter(state.database, term);
+		query.typing = '';
+		query.done.add(term);
+		result.totals[term] = count_result.counter;
+		count_result.result.forEach(function (row, i) {
+			var tags = state.directoryMetadata.tags[i];
+			if (!(i in drawData)) {
+				drawData.push({
+					labels: tags.keys(),
+					datasets: []
+				});
+			}
+			Array.prototype.push.apply(drawData[i].datasets, getChartDataObject(row, tags, term));
+		});
+		result.csvBlob = toCSV(result.totals, drawData);
+		target.setState({
+			query: query,
+			result: result
+		});
+	}
+};
+
 exports.default = FrequencyStore;
 
 
@@ -637,7 +612,7 @@ function occurrencesCounter(texts, string) {
 			var text = _step2.value;
 
 			var c = text.occurrences(string);
-			text.metadata.tags.map(function (tag, i) {
+			text.metadata.tags.forEach(function (tag, i) {
 				if (!(i in result)) {
 					result.push({});
 				}
@@ -734,15 +709,11 @@ var _States2 = _interopRequireDefault(_States);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function RouterStore(target, action) {
-	switch (action.type) {
-		case 'PageChange':
-			target.setState(_States2.default.PageState(action.payload));
-			break;
-		default:
-			break;
+var RouterStore = {
+	PageChange: function PageChange(payload, state, target) {
+		target.setState(_States2.default.PageState(payload));
 	}
-}
+};
 exports.default = RouterStore;
 
 /***/ }),
