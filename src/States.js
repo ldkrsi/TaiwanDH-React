@@ -34,7 +34,6 @@ const resultMap = {
 	frequency: function(){
 		return {
 			totals: {},
-			csvBlob: null,
 			drawData: []
 		};
 	}

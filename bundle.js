@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 15);
+/******/ 	return __webpack_require__(__webpack_require__.s = 16);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -119,7 +119,6 @@ var resultMap = {
 	frequency: function frequency() {
 		return {
 			totals: {},
-			csvBlob: null,
 			drawData: []
 		};
 	}
@@ -190,15 +189,15 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _AppStore = __webpack_require__(7);
+var _AppStore = __webpack_require__(8);
 
 var _AppStore2 = _interopRequireDefault(_AppStore);
 
-var _RouterStore = __webpack_require__(9);
+var _RouterStore = __webpack_require__(10);
 
 var _RouterStore2 = _interopRequireDefault(_RouterStore);
 
-var _FrequencyStore = __webpack_require__(8);
+var _FrequencyStore = __webpack_require__(9);
 
 var _FrequencyStore2 = _interopRequireDefault(_FrequencyStore);
 
@@ -270,11 +269,11 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _StatePage = __webpack_require__(13);
+var _StatePage = __webpack_require__(14);
 
 var _StatePage2 = _interopRequireDefault(_StatePage);
 
-var _FrequencyPage = __webpack_require__(12);
+var _FrequencyPage = __webpack_require__(13);
 
 var _FrequencyPage2 = _interopRequireDefault(_FrequencyPage);
 
@@ -397,11 +396,54 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _TextEntity = __webpack_require__(11);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var MixinMethods = function () {
+	function MixinMethods() {
+		_classCallCheck(this, MixinMethods);
+	}
+
+	_createClass(MixinMethods, null, [{
+		key: "getCsvBlob",
+		value: function getCsvBlob(my_array) {
+			var csvContent = "\uFEFF";
+			my_array.forEach(function (infoArray, index) {
+				infoArray.forEach(function (a, i) {
+					csvContent += "\"";
+					csvContent += a.replace(/\r/g, "").replace(/\n/g, "").replace(/"/g, "\"\"");
+					csvContent += i < infoArray.length ? "\"," : "\"";
+				});
+				if (index < my_array.length) {
+					csvContent += "\n";
+				}
+			});
+			return new Blob([csvContent], { type: 'text/csv' });
+		}
+	}]);
+
+	return MixinMethods;
+}();
+
+exports.default = MixinMethods;
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _TextEntity = __webpack_require__(12);
 
 var _TextEntity2 = _interopRequireDefault(_TextEntity);
 
-var _TagDict = __webpack_require__(10);
+var _TagDict = __webpack_require__(11);
 
 var _TagDict2 = _interopRequireDefault(_TagDict);
 
@@ -474,7 +516,7 @@ function read_file(file, target) {
 }
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -483,6 +525,13 @@ function read_file(file, target) {
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
+
+var _mixin = __webpack_require__(7);
+
+var _mixin2 = _interopRequireDefault(_mixin);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 var FrequencyStore = {
 	FrequencyTyping: function FrequencyTyping(payload, state, target) {
 		var query = state.query;
@@ -504,9 +553,9 @@ var FrequencyStore = {
 
 				item.datasets = item.datasets.filter(function (row, i) {
 					if (row.myID !== payload) {
-						return false;
+						return true;
 					}
-					return true;
+					return false;
 				});
 			}
 		} catch (err) {
@@ -524,15 +573,17 @@ var FrequencyStore = {
 			}
 		}
 
-		result.csvBlob = toCSV(result.totals, result.drawData);
+		result.drawData.forEach(function (item, i) {
+			item.csv = drawDataToCSV(item, state.directoryMetadata.tags[i]);
+		});
 		target.setState({
 			query: query,
 			result: result
 		});
 	},
 	FrequencySubmit: function FrequencySubmit(payload, state, target) {
-		var query = state.query;
-		var result = state.result;
+		var query = state.query,
+		    result = state.result;
 		var term = query.typing.trim();
 		if (term.length === 0) {
 			return;
@@ -547,12 +598,15 @@ var FrequencyStore = {
 			if (!(i in drawData)) {
 				drawData.push({
 					labels: tags.keys(),
+					csv: null,
 					datasets: []
 				});
 			}
-			Array.prototype.push.apply(drawData[i].datasets, getChartDataObject(row, tags, term));
+			Array.prototype.push.apply(drawData[i].datasets, getChartDataRow(row, tags, term));
 		});
-		result.csvBlob = toCSV(result.totals, drawData);
+		drawData.forEach(function (item, i) {
+			item.csv = drawDataToCSV(item, state.directoryMetadata.tags[i]);
+		});
 		target.setState({
 			query: query,
 			result: result
@@ -562,44 +616,21 @@ var FrequencyStore = {
 
 exports.default = FrequencyStore;
 
-
-function toCSV(totals, drawData) {
-	var my_array = [['詞彙', '出現次數']];
-	for (var key in totals) {
-		my_array.push([key, totals[key].toString()]);
-	}
-	my_array.push([]);
-	drawData.forEach(function (chart, i) {
-		my_array.push(['第' + (i + 1).toString() + '層']);
-		my_array.push(['詞彙'].concat(chart.labels.slice()));
-		chart.datasets.forEach(function (item, j) {
-			if (item.type !== 'bar') {
-				return;
-			}
-			my_array.push([item.myID].concat(item.data.map(function (num) {
-				return num.toString();
-			})));
-		});
-		my_array.push([]);
-	});
-	return getCsvBlob(my_array);
-}
-
-function getCsvBlob(my_array) {
-	var csvContent = '\uFEFF';
-	my_array.forEach(function (infoArray, index) {
-		infoArray.forEach(function (a, i) {
-			csvContent += "\"";
-			csvContent += a.replace(/\r/g, "").replace(/\n/g, "").replace(/"/g, "\"\"");
-			csvContent += i < infoArray.length ? "\"," : "\"";
-		});
-		if (index < my_array.length) {
-			csvContent += "\n";
+function drawDataToCSV(chartData, tagData) {
+	var my_array = [[''].concat(chartData.labels)];
+	chartData.datasets.forEach(function (row) {
+		if (row.type !== 'bar') {
+			return;
 		}
+		my_array.push([row.myID].concat(row.data.map(function (num) {
+			return num.toString();
+		})));
 	});
-	return new Blob([csvContent], { type: 'text/csv' });
+	my_array.push(['文章總計'].concat(chartData.labels.map(function (item) {
+		return tagData.value(item).toString();
+	})));
+	return _mixin2.default.getCsvBlob(my_array);
 }
-
 function occurrencesCounter(texts, string) {
 	var result = [],
 	    counter = 0;
@@ -648,7 +679,7 @@ function occurrencesCounter(texts, string) {
 	};
 }
 var colors = [[255, 59, 48], [90, 200, 250], [255, 149, 0], [0, 122, 255], [255, 204, 0], [88, 86, 214], [76, 217, 100], [255, 45, 85], [0, 0, 0], [158, 158, 158]];
-function getChartDataObject(source, tags, string) {
+function getChartDataRow(source, tags, string) {
 	var data1 = tags.keys().map(function (t) {
 		return source[t];
 	});
@@ -693,7 +724,7 @@ function getChartDataObject(source, tags, string) {
 }
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -717,7 +748,7 @@ var RouterStore = {
 exports.default = RouterStore;
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -770,7 +801,7 @@ var TagDict = function () {
 exports.default = TagDict;
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -810,7 +841,7 @@ var TextEntity = function () {
 exports.default = TextEntity;
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -824,7 +855,7 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactChartjs = __webpack_require__(14);
+var _reactChartjs = __webpack_require__(15);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -845,24 +876,6 @@ function FrequencyPage(props) {
 					redraw: props.state.result.redraw
 				}));
 			});
-			result.push(_react2.default.createElement(
-				'p',
-				null,
-				'\u7D2F\u8A08(\u9577\u689D\u5716) = \u51FA\u73FE\u6B21\u6578'
-			));
-			result.push(_react2.default.createElement(
-				'p',
-				null,
-				'\u6BD4\u7387(\u6298\u7DDA\u5716) = \u51FA\u73FE\u6B21\u6578 / \u8A72\u5206\u985E\u6587\u7AE0\u7E3D\u6578'
-			));
-			result.push(_react2.default.createElement(
-				'a',
-				{
-					download: 'test.csv',
-					href: URL.createObjectURL(props.state.result.csvBlob)
-				},
-				'\u4E0B\u8F09'
-			));
 		}
 	}
 	return _react2.default.createElement(
@@ -903,7 +916,7 @@ function ResultArea(props) {
 	};
 	return _react2.default.createElement(
 		'div',
-		null,
+		{ className: 'chart-element' },
 		_react2.default.createElement(
 			'h2',
 			null,
@@ -916,18 +929,41 @@ function ResultArea(props) {
 	);
 }
 function ChartElement(props) {
+	var name = "第" + props.deep + "層";
 	return _react2.default.createElement(
 		'div',
-		null,
+		{ className: 'chart-element' },
 		_react2.default.createElement(
 			'h3',
 			null,
-			"第" + props.deep + "層"
+			name
 		),
 		_react2.default.createElement(_reactChartjs.Bar, {
 			data: props.data,
 			options: chart_options
-		})
+		}),
+		_react2.default.createElement(
+			'p',
+			null,
+			_react2.default.createElement(
+				'a',
+				{
+					download: name + '.csv',
+					href: URL.createObjectURL(props.data.csv)
+				},
+				'\u4E0B\u8F09\u5716\u8868\u8CC7\u6599(csv)'
+			)
+		),
+		_react2.default.createElement(
+			'p',
+			null,
+			'\u7D2F\u8A08(\u9577\u689D\u5716) = \u51FA\u73FE\u6B21\u6578'
+		),
+		_react2.default.createElement(
+			'p',
+			null,
+			'\u6BD4\u7387(\u6298\u7DDA\u5716) = \u51FA\u73FE\u6B21\u6578 / \u8A72\u5206\u985E\u6587\u7AE0\u7E3D\u6578'
+		)
 	);
 }
 var chart_options = {
@@ -1000,7 +1036,7 @@ function InputArea(props) {
 }
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1086,13 +1122,13 @@ function DirectoryMetadata(props) {
 }
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports) {
 
 module.exports = reactChartjs2;
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

@@ -1,3 +1,4 @@
+import MixinMethods from '../mixin.js';
 const FrequencyStore = {
 	FrequencyTyping: function(payload, state, target){
 		let query = state.query;
@@ -12,20 +13,21 @@ const FrequencyStore = {
 		for(let item of result.drawData){
 			item.datasets = item.datasets.filter(function(row, i){
 				if(row.myID !== payload){
-					return false;
+					return true;
 				}
-				return true;
+				return false;
 			});
 		}
-		result.csvBlob = toCSV(result.totals, result.drawData);
+		result.drawData.forEach(function(item, i){
+			item.csv = drawDataToCSV(item, state.directoryMetadata.tags[i]);
+		});
 		target.setState({
 			query: query,
 			result: result
 		});
 	},
 	FrequencySubmit: function(payload, state, target){
-		let query = state.query;
-		let result = state.result;
+		let query = state.query, result = state.result;
 		let term = query.typing.trim();
 		if(term.length === 0){
 			return;
@@ -40,12 +42,15 @@ const FrequencyStore = {
 			if(!(i in drawData)){
 				drawData.push({
 					labels: tags.keys(),
+					csv: null,
 					datasets: []
 				});
 			}
-			Array.prototype.push.apply(drawData[i].datasets, getChartDataObject(row, tags, term));
+			Array.prototype.push.apply(drawData[i].datasets, getChartDataRow(row, tags, term));
 		});
-		result.csvBlob = toCSV(result.totals, drawData);
+		drawData.forEach(function(item, i){
+			item.csv = drawDataToCSV(item, state.directoryMetadata.tags[i]);
+		});
 		target.setState({
 			query: query,
 			result: result
@@ -54,44 +59,21 @@ const FrequencyStore = {
 };
 
 export default FrequencyStore;
-
-function toCSV(totals, drawData){
-	let my_array = [['詞彙','出現次數']];
-	for(let key in totals){
-		my_array.push([key, totals[key].toString()]);
-	}
-	my_array.push([]);
-	drawData.forEach(function(chart,i){
-		my_array.push(['第'+(i+1).toString()+'層']);
-		my_array.push(['詞彙'].concat(chart.labels.slice()));
-		chart.datasets.forEach(function(item,j){
-			if(item.type !== 'bar'){
-				return;
-			}
-			my_array.push([item.myID].concat(item.data.map(function(num){
-				return num.toString();
-			})));
-		});
-		my_array.push([]);
-	});
-	return getCsvBlob(my_array);
-}
-
-function getCsvBlob(my_array){
-	var csvContent = "\uFEFF";
-	my_array.forEach(function(infoArray, index){
-		infoArray.forEach(function(a,i){
-			csvContent+= "\"";
-			csvContent+= a.replace(/\r/g, "").replace(/\n/g, "").replace(/"/g, "\"\"");
-			csvContent+= i < infoArray.length ? "\"," : "\"";
-		});
-		if(index < my_array.length){
-			csvContent +=  "\n";
+function drawDataToCSV(chartData, tagData){
+	let my_array = [[''].concat(chartData.labels)];
+	chartData.datasets.forEach(function(row){
+		if(row.type !== 'bar'){
+			return;
 		}
+		my_array.push([row.myID].concat(row.data.map(function(num){
+			return num.toString();
+		})));
 	});
-	return new Blob([csvContent], {type: 'text/csv'});
+	my_array.push(['文章總計'].concat(chartData.labels.map(function(item){
+		return tagData.value(item).toString();
+	})));
+	return MixinMethods.getCsvBlob(my_array);
 }
-
 function occurrencesCounter(texts, string){
 	let result = [], counter = 0;
 	for(let text of texts){
@@ -117,7 +99,7 @@ let colors = [
 	[255,204,0], [88,86,214], [76,217,100], [255,45,85],
 	[0,0,0], [158,158,158]
 ];
-function getChartDataObject(source, tags, string){
+function getChartDataRow(source, tags, string){
 	let data1 = tags.keys().map(function(t){
 		return source[t];
 	});

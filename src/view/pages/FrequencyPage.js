@@ -16,12 +16,6 @@ function FrequencyPage(props){
 					redraw={props.state.result.redraw} 
 				/>);
 			});
-			result.push(<p>累計(長條圖) = 出現次數</p>);
-			result.push(<p>比率(折線圖) = 出現次數 / 該分類文章總數</p>);
-			result.push(<a 
-				download="test.csv"
-				href={URL.createObjectURL(props.state.result.csvBlob)}
-			>下載</a>);
 		}
 	}
 	return(<div>
@@ -53,7 +47,7 @@ function ResultArea(props){
 			data: dataset
 		}]
 	}
-	return(<div>
+	return(<div className="chart-element">
 		<h2>詞頻統計</h2>
 		<Bar 
 			data={data} 
@@ -62,12 +56,19 @@ function ResultArea(props){
 	</div>);
 }
 function ChartElement(props){
-	return(<div>
-		<h3>{"第"+props.deep+"層"}</h3>
+	let name = "第"+props.deep+"層";
+	return(<div className="chart-element">
+		<h3>{name}</h3>
 		<Bar
 			data={props.data} 
 			options={chart_options}
 		/>
+		<p><a 
+			download={name+'.csv'}
+			href={URL.createObjectURL(props.data.csv)}
+		>下載圖表資料(csv)</a></p>
+		<p>累計(長條圖) = 出現次數</p>
+		<p>比率(折線圖) = 出現次數 / 該分類文章總數</p>
 	</div>);
 
 }
