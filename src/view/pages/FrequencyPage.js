@@ -4,23 +4,24 @@ import {Bar} from 'react-chartjs-2';
 
 
 function FrequencyPage(props){
+	let state = props.state;
+	if(state.query.done.size === 0){
+		return(<div><InputArea {...props} /></div>);
+	}
 	let result = [];
-	if(props.state.query.done.size > 0){
-		result.push(<ResultArea totals={props.state.result.totals} />);
-		if(props.state.directoryMetadata.tags.length > 0){
-			result.push(<h2>分層統計</h2>);
-			props.state.result.drawData.map(function(data, i){
-				result.push(<ChartElement key={i} 
-					deep={(i+1).toString()} 
-					data={data} 
-					redraw={props.state.result.redraw} 
-				/>);
-			});
-		}
+	if(state.result.drawData.length > 0){
+		result.push(<h2>分層統計</h2>);
+		state.result.drawData.forEach(function(data, i){
+			result.push(<ChartElement key={i} 
+				deep={(i+1).toString()} 
+				data={data} 
+			/>);
+		});
 	}
 	return(<div>
 		<InputArea {...props} />
 		<InputedArea {...props} />
+		<ResultArea totals={state.result.totals} />
 		{result.map(function(item){return item;})}
 	</div>);
 }

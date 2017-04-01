@@ -1,6 +1,7 @@
 import React from 'react';
 
 function StatePage(props){
+	let state = props.state;
 	const Reset = (e) => { 
 		let f = confirm('確定要重設輸入資料？');
 		if(f !== true){
@@ -10,8 +11,8 @@ function StatePage(props){
 	}
 	return(<div>
 		<DirectoryMetadata 
-			metadata={props.state.directoryMetadata} 
-			count={props.state.database.length}
+			metadata={state.directoryMetadata} 
+			count={state.database.length}
 		/>
 		<button 
 			className="warning"

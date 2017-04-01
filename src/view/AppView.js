@@ -1,19 +1,16 @@
 import React from 'react';
 
 function AppView(props) {
-	let MainDom = '';
-	let InputDom = <DirectoryInput actions={props.actions} />;
-	if(props.state.database.length > 0){
-		MainDom = <MainArea {...props} />;
-		InputDom = '';
-	}
-	return(
-		<div>
-			{InputDom}
+	if(props.state.database.length === 0){
+		return(<div>
+			<DirectoryInput actions={props.actions} />
 			<nav><Menu {...props} /></nav>
-			{MainDom}
-		</div>
-	);
+		</div>);
+	}
+	return(<div>
+		<nav><Menu {...props} /></nav>
+		<MainArea {...props} />
+	</div>);
 }
 export default AppView;
 
@@ -51,21 +48,18 @@ function Menu(props){
 }
 
 function DirectoryInput(props){
-	return(
-		<div className="directory-input">
-			<label
-				htmlFor="directory-input"
-			>選擇文本所在資料夾</label>
-			<input type="file"
-				id="directory-input"
-				ref={(d) => {
-					if(d){
-						d.webkitdirectory = true;
-					}
-				}}
-				onChange={props.actions.InputDirChange}
-			/>
-		</div>
-		
-	);
+	return(<div className="directory-input">
+		<label
+			htmlFor="directory-input"
+		>選擇文本所在資料夾</label>
+		<input type="file"
+			id="directory-input"
+			ref={(d) => {
+				if(d){
+					d.webkitdirectory = true;
+				}
+			}}
+			onChange={props.actions.InputDirChange}
+		/>
+	</div>);
 }

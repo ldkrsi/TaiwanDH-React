@@ -280,22 +280,27 @@ var _FrequencyPage2 = _interopRequireDefault(_FrequencyPage);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function AppView(props) {
-	var MainDom = '';
-	var InputDom = _react2.default.createElement(DirectoryInput, { actions: props.actions });
-	if (props.state.database.length > 0) {
-		MainDom = _react2.default.createElement(MainArea, props);
-		InputDom = '';
+	if (props.state.database.length === 0) {
+		return _react2.default.createElement(
+			'div',
+			null,
+			_react2.default.createElement(DirectoryInput, { actions: props.actions }),
+			_react2.default.createElement(
+				'nav',
+				null,
+				_react2.default.createElement(Menu, props)
+			)
+		);
 	}
 	return _react2.default.createElement(
 		'div',
 		null,
-		InputDom,
 		_react2.default.createElement(
 			'nav',
 			null,
 			_react2.default.createElement(Menu, props)
 		),
-		MainDom
+		_react2.default.createElement(MainArea, props)
 	);
 }
 exports.default = AppView;
@@ -860,29 +865,34 @@ var _reactChartjs = __webpack_require__(15);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function FrequencyPage(props) {
+	var state = props.state;
+	if (state.query.done.size === 0) {
+		return _react2.default.createElement(
+			'div',
+			null,
+			_react2.default.createElement(InputArea, props)
+		);
+	}
 	var result = [];
-	if (props.state.query.done.size > 0) {
-		result.push(_react2.default.createElement(ResultArea, { totals: props.state.result.totals }));
-		if (props.state.directoryMetadata.tags.length > 0) {
-			result.push(_react2.default.createElement(
-				'h2',
-				null,
-				'\u5206\u5C64\u7D71\u8A08'
-			));
-			props.state.result.drawData.map(function (data, i) {
-				result.push(_react2.default.createElement(ChartElement, { key: i,
-					deep: (i + 1).toString(),
-					data: data,
-					redraw: props.state.result.redraw
-				}));
-			});
-		}
+	if (state.result.drawData.length > 0) {
+		result.push(_react2.default.createElement(
+			'h2',
+			null,
+			'\u5206\u5C64\u7D71\u8A08'
+		));
+		state.result.drawData.forEach(function (data, i) {
+			result.push(_react2.default.createElement(ChartElement, { key: i,
+				deep: (i + 1).toString(),
+				data: data
+			}));
+		});
 	}
 	return _react2.default.createElement(
 		'div',
 		null,
 		_react2.default.createElement(InputArea, props),
 		_react2.default.createElement(InputedArea, props),
+		_react2.default.createElement(ResultArea, { totals: state.result.totals }),
 		result.map(function (item) {
 			return item;
 		})
@@ -1053,6 +1063,7 @@ var _react2 = _interopRequireDefault(_react);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function StatePage(props) {
+	var state = props.state;
 	var Reset = function Reset(e) {
 		var f = confirm('確定要重設輸入資料？');
 		if (f !== true) {
@@ -1064,8 +1075,8 @@ function StatePage(props) {
 		'div',
 		null,
 		_react2.default.createElement(DirectoryMetadata, {
-			metadata: props.state.directoryMetadata,
-			count: props.state.database.length
+			metadata: state.directoryMetadata,
+			count: state.database.length
 		}),
 		_react2.default.createElement(
 			'button',
