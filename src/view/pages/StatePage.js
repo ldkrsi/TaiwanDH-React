@@ -44,7 +44,7 @@ function DoughnutChart(props){
 		<h3>{name}</h3>
 		<Doughnut data={data} options={options}/>
 		<ExportComponent 
-			name={'詞頻統計.csv'}
+			name={name+'分類統計.csv'}
 			blobObject={blob_obj}
 			text="匯出統計資料(csv)"
 		/>

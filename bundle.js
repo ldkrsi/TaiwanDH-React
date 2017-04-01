@@ -1101,7 +1101,7 @@ function DoughnutChart(props) {
 		),
 		_react2.default.createElement(_reactChartjs.Doughnut, { data: data, options: options }),
 		_react2.default.createElement(_exportComponent2.default, {
-			name: '詞頻統計.csv',
+			name: name + '分類統計.csv',
 			blobObject: blob_obj,
 			text: '\u532F\u51FA\u7D71\u8A08\u8CC7\u6599(csv)'
 		})
