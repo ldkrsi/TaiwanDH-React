@@ -1,7 +1,7 @@
 import React from 'react';
 import {Bar} from 'react-chartjs-2';
-
-
+import ExportComponent from '../components/export-component';
+import MixinMethods from '../../mixin/mixin';
 
 function FrequencyPage(props){
 	let state = props.state;
@@ -25,7 +25,6 @@ function FrequencyPage(props){
 		{result.map(function(item){return item;})}
 	</div>);
 }
-
 export default FrequencyPage;
 
 function ResultArea(props){
@@ -48,11 +47,20 @@ function ResultArea(props){
 			data: dataset
 		}]
 	}
+	let blob_obj = MixinMethods.getCsvBlob([
+		[''].concat(keys), 
+		['數量'].concat(dataset.map(function(value){return value.toString();}))
+	]);
 	return(<div className="chart-element">
 		<h2>詞頻統計</h2>
 		<Bar 
 			data={data} 
 			options={options}
+		/>
+		<ExportComponent 
+			name={'詞頻統計.csv'}
+			blobObject={blob_obj}
+			text="匯出圖表資料(csv)"
 		/>
 	</div>);
 }
@@ -64,14 +72,14 @@ function ChartElement(props){
 			data={props.data} 
 			options={chart_options}
 		/>
-		<p><a 
-			download={name+'.csv'}
-			href={URL.createObjectURL(props.data.csv)}
-		>下載圖表資料(csv)</a></p>
+		<ExportComponent 
+			name={'詞頻統計('+name+').csv'}
+			blobObject={props.data.csv}
+			text="匯出圖表資料(csv)"
+		/>
 		<p>累計(長條圖) = 出現次數</p>
 		<p>比率(折線圖) = 出現次數 / 該分類文章總數</p>
 	</div>);
-
 }
 const chart_options = {
 	scales: {
@@ -107,8 +115,6 @@ function InputedArea(props){
 		})}
 	</ul></div>);
 }
-
-
 function InputArea(props){
 	const onChange = (e) => {props.actions.FrequencyTyping(e.target.value)}
 	return(<div>

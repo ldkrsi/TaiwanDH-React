@@ -391,49 +391,7 @@ function DirectoryInput(props) {
 module.exports = ReactDOM;
 
 /***/ }),
-/* 7 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var MixinMethods = function () {
-	function MixinMethods() {
-		_classCallCheck(this, MixinMethods);
-	}
-
-	_createClass(MixinMethods, null, [{
-		key: "getCsvBlob",
-		value: function getCsvBlob(my_array) {
-			var csvContent = "\uFEFF";
-			my_array.forEach(function (infoArray, index) {
-				infoArray.forEach(function (a, i) {
-					csvContent += "\"";
-					csvContent += a.replace(/\r/g, "").replace(/\n/g, "").replace(/"/g, "\"\"");
-					csvContent += i < infoArray.length ? "\"," : "\"";
-				});
-				if (index < my_array.length) {
-					csvContent += "\n";
-				}
-			});
-			return new Blob([csvContent], { type: 'text/csv' });
-		}
-	}]);
-
-	return MixinMethods;
-}();
-
-exports.default = MixinMethods;
-
-/***/ }),
+/* 7 */,
 /* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -531,9 +489,13 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _mixin = __webpack_require__(7);
+var _mixin = __webpack_require__(24);
 
 var _mixin2 = _interopRequireDefault(_mixin);
+
+var _colorSet = __webpack_require__(23);
+
+var _colorSet2 = _interopRequireDefault(_colorSet);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -599,15 +561,17 @@ var FrequencyStore = {
 		query.done.add(term);
 		result.totals[term] = count_result.counter;
 		count_result.result.forEach(function (row, i) {
-			var tags = state.directoryMetadata.tags[i];
+			var tag_dict = state.directoryMetadata.tags[i];
 			if (!(i in drawData)) {
 				drawData.push({
-					labels: tags.keys(),
+					labels: tag_dict.keys(),
+					datasets: [],
 					csv: null,
-					datasets: []
+					colorController: new _colorSet2.default(false)
 				});
 			}
-			Array.prototype.push.apply(drawData[i].datasets, getChartDataRow(row, tags, term));
+			var obj = drawData[i];
+			Array.prototype.push.apply(obj.datasets, getChartDataRow(tag_dict, row, term, obj.colorController));
 		});
 		drawData.forEach(function (item, i) {
 			item.csv = drawDataToCSV(item, state.directoryMetadata.tags[i]);
@@ -618,8 +582,8 @@ var FrequencyStore = {
 		});
 	}
 };
-
 exports.default = FrequencyStore;
+
 
 function drawDataToCSV(chartData, tagData) {
 	var my_array = [[''].concat(chartData.labels)];
@@ -683,18 +647,16 @@ function occurrencesCounter(texts, string) {
 		result: result
 	};
 }
-var colors = [[255, 59, 48], [90, 200, 250], [255, 149, 0], [0, 122, 255], [255, 204, 0], [88, 86, 214], [76, 217, 100], [255, 45, 85], [0, 0, 0], [158, 158, 158]];
-function getChartDataRow(source, tags, string) {
-	var data1 = tags.keys().map(function (t) {
+function getChartDataRow(tag_dict, source, string, colors) {
+	var data1 = tag_dict.keys().map(function (t) {
 		return source[t];
 	});
-	var data2 = tags.keys().map(function (t) {
-		return Math.round(source[t] / tags.value(t) * 100) / 100;
+	var data2 = tag_dict.keys().map(function (t) {
+		return Math.round(source[t] / tag_dict.value(t) * 100) / 100;
 	});
-	var color = colors[0].map(function (x) {
+	var color = colors.getColor_array().map(function (x) {
 		return x.toString();
 	}).join(',');
-	colors.push(colors.shift());
 	return [{
 		type: 'bar',
 		yAxisID: 'y-axis-1',
@@ -862,6 +824,14 @@ var _react2 = _interopRequireDefault(_react);
 
 var _reactChartjs = __webpack_require__(15);
 
+var _exportComponent = __webpack_require__(25);
+
+var _exportComponent2 = _interopRequireDefault(_exportComponent);
+
+var _mixin = __webpack_require__(24);
+
+var _mixin2 = _interopRequireDefault(_mixin);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function FrequencyPage(props) {
@@ -898,7 +868,6 @@ function FrequencyPage(props) {
 		})
 	);
 }
-
 exports.default = FrequencyPage;
 
 
@@ -924,6 +893,9 @@ function ResultArea(props) {
 			data: dataset
 		}]
 	};
+	var blob_obj = _mixin2.default.getCsvBlob([[''].concat(keys), ['數量'].concat(dataset.map(function (value) {
+		return value.toString();
+	}))]);
 	return _react2.default.createElement(
 		'div',
 		{ className: 'chart-element' },
@@ -935,6 +907,11 @@ function ResultArea(props) {
 		_react2.default.createElement(_reactChartjs.Bar, {
 			data: data,
 			options: options
+		}),
+		_react2.default.createElement(_exportComponent2.default, {
+			name: '詞頻統計.csv',
+			blobObject: blob_obj,
+			text: '\u532F\u51FA\u5716\u8868\u8CC7\u6599(csv)'
 		})
 	);
 }
@@ -952,18 +929,11 @@ function ChartElement(props) {
 			data: props.data,
 			options: chart_options
 		}),
-		_react2.default.createElement(
-			'p',
-			null,
-			_react2.default.createElement(
-				'a',
-				{
-					download: name + '.csv',
-					href: URL.createObjectURL(props.data.csv)
-				},
-				'\u4E0B\u8F09\u5716\u8868\u8CC7\u6599(csv)'
-			)
-		),
+		_react2.default.createElement(_exportComponent2.default, {
+			name: '詞頻統計(' + name + ').csv',
+			blobObject: props.data.csv,
+			text: '\u532F\u51FA\u5716\u8868\u8CC7\u6599(csv)'
+		}),
 		_react2.default.createElement(
 			'p',
 			null,
@@ -1021,7 +991,6 @@ function InputedArea(props) {
 		)
 	);
 }
-
 function InputArea(props) {
 	var onChange = function onChange(e) {
 		props.actions.FrequencyTyping(e.target.value);
@@ -1060,10 +1029,85 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
+var _reactChartjs = __webpack_require__(15);
+
+var _colorSet = __webpack_require__(23);
+
+var _colorSet2 = _interopRequireDefault(_colorSet);
+
+var _exportComponent = __webpack_require__(25);
+
+var _exportComponent2 = _interopRequireDefault(_exportComponent);
+
+var _mixin = __webpack_require__(24);
+
+var _mixin2 = _interopRequireDefault(_mixin);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function StatePage(props) {
 	var state = props.state;
+	var tagsArray = state.directoryMetadata.tags;
+	return _react2.default.createElement(
+		'div',
+		null,
+		_react2.default.createElement(DirectoryMetadata, {
+			metadata: state.directoryMetadata,
+			count: state.database.length
+		}),
+		tagsArray.length > 0 ? _react2.default.createElement(
+			'h2',
+			null,
+			'\u5206\u985E\u6578\u91CF'
+		) : '',
+		tagsArray.map(function (row, i) {
+			return _react2.default.createElement(DoughnutChart, { key: i, tags: row, idStr: (i + 1).toString() });
+		})
+	);
+}
+exports.default = StatePage;
+
+
+function DoughnutChart(props) {
+	var tags = props.tags;
+	var keys = tags.keys();
+	var name = "第" + props.idStr + "層";
+	var colors = new _colorSet2.default();
+	var my_colors = keys.map(function () {
+		return colors.getColor_rgba();
+	});
+	var data = {
+		labels: keys,
+		datasets: [{
+			data: keys.map(function (key) {
+				return tags.value(key);
+			}),
+			backgroundColor: my_colors,
+			hoverBackgroundColor: my_colors
+		}]
+	};
+	var options = { animation: { animateRotate: false } };
+	var blob_obj = _mixin2.default.getCsvBlob([[''].concat(keys), ['數量'].concat(data.datasets[0].data.map(function (value) {
+		return value.toString();
+	}))]);
+	var my_array = [];
+	return _react2.default.createElement(
+		'div',
+		{ className: 'chart-element' },
+		_react2.default.createElement(
+			'h3',
+			null,
+			name
+		),
+		_react2.default.createElement(_reactChartjs.Doughnut, { data: data, options: options }),
+		_react2.default.createElement(_exportComponent2.default, {
+			name: '詞頻統計.csv',
+			blobObject: blob_obj,
+			text: '\u532F\u51FA\u7D71\u8A08\u8CC7\u6599(csv)'
+		})
+	);
+}
+function DirectoryMetadata(props) {
 	var Reset = function Reset(e) {
 		var f = confirm('確定要重設輸入資料？');
 		if (f !== true) {
@@ -1073,61 +1117,57 @@ function StatePage(props) {
 	};
 	return _react2.default.createElement(
 		'div',
-		null,
-		_react2.default.createElement(DirectoryMetadata, {
-			metadata: state.directoryMetadata,
-			count: state.database.length
-		}),
+		{ className: 'block-element' },
 		_react2.default.createElement(
-			'button',
-			{
-				className: 'warning',
-				onClick: Reset
-			},
-			'Reset'
-		)
-	);
-}
-exports.default = StatePage;
-
-function DirectoryMetadata(props) {
-	return _react2.default.createElement(
-		'dl',
-		null,
-		_react2.default.createElement(
-			'dt',
+			'dl',
 			null,
-			'\u8CC7\u6599\u593E\u540D\u7A31'
+			_react2.default.createElement(
+				'dt',
+				null,
+				'\u8CC7\u6599\u593E\u540D\u7A31'
+			),
+			_react2.default.createElement(
+				'dd',
+				null,
+				props.metadata.name
+			),
+			_react2.default.createElement(
+				'dt',
+				null,
+				'\u8CC7\u6599\u593E\u6DF1\u5EA6'
+			),
+			_react2.default.createElement(
+				'dd',
+				null,
+				props.metadata.deep,
+				'\u5C64'
+			),
+			_react2.default.createElement(
+				'dt',
+				null,
+				'\u8F09\u5165\u72C0\u614B'
+			),
+			_react2.default.createElement(
+				'dd',
+				null,
+				'\u5DF2\u8F09\u5165',
+				props.count,
+				'\u500Btxt\u6A94\uFF0C\u5171',
+				props.metadata.textCount,
+				'\u500Btxt\u6A94'
+			)
 		),
 		_react2.default.createElement(
-			'dd',
+			'p',
 			null,
-			props.metadata.name
-		),
-		_react2.default.createElement(
-			'dt',
-			null,
-			'\u8CC7\u6599\u593E\u6DF1\u5EA6'
-		),
-		_react2.default.createElement(
-			'dd',
-			null,
-			props.metadata.deep,
-			'\u5C64'
-		),
-		_react2.default.createElement(
-			'dt',
-			null,
-			'\u8F09\u5165\u72C0\u614B'
-		),
-		_react2.default.createElement(
-			'dd',
-			null,
-			'\u5DF2\u8F09\u5165',
-			props.count,
-			'\u500Btxt\u6A94\uFF0C\u5171',
-			props.metadata.textCount,
-			'\u500Btxt\u6A94'
+			_react2.default.createElement(
+				'button',
+				{
+					className: 'warning',
+					onClick: Reset
+				},
+				'Reset'
+			)
 		)
 	);
 }
@@ -1209,6 +1249,162 @@ var AppContainer = function (_React$Component) {
 }(_react2.default.Component);
 
 _reactDom2.default.render(_react2.default.createElement(AppContainer, null), document.getElementById('app'));
+
+/***/ }),
+/* 17 */,
+/* 18 */,
+/* 19 */,
+/* 20 */,
+/* 21 */,
+/* 22 */,
+/* 23 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var ColorSet = function () {
+	function ColorSet() {
+		var alpha = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+
+		_classCallCheck(this, ColorSet);
+
+		this.grey = 61;
+		this.colors = [[this.grey, this.grey, this.grey], [255, 59, 48], [90, 200, 250], [255, 149, 0], [0, 122, 255], [255, 204, 0], [88, 86, 214], [76, 217, 100], [255, 45, 85]];
+		this.alpha = null;
+		if (alpha) {
+			this.alpha = 1.6;
+		}
+	}
+
+	_createClass(ColorSet, [{
+		key: 'rotate',
+		value: function rotate() {
+			var _this = this;
+
+			var c = this.colors.shift();
+			this.colors.push(c);
+			if (this.alpha === null) {
+				return;
+			}
+			var circle = c.every(function (value) {
+				return value === _this.grey;
+			});
+			if (circle) {
+				this.alpha = this.alpha * 0.625;
+			}
+		}
+	}, {
+		key: 'getColor_array',
+		value: function getColor_array() {
+			this.rotate();
+			if (this.alpha === null) {
+				return this.colors[0].slice();
+			}
+			return this.colors[0].slice().push(this.alpha);
+		}
+	}, {
+		key: 'getColor_rgba',
+		value: function getColor_rgba() {
+			this.rotate();
+			var c = this.colors[0].map(function (x) {
+				return x.toString();
+			}).join(',');
+			if (this.alpha === null) {
+				return 'rgba(' + c + ',1)';
+			}
+			return 'rgba(' + c + ',' + this.alpha.toFixed(3) + ')';
+		}
+	}]);
+
+	return ColorSet;
+}();
+
+exports.default = ColorSet;
+
+/***/ }),
+/* 24 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var MixinMethods = function () {
+	function MixinMethods() {
+		_classCallCheck(this, MixinMethods);
+	}
+
+	_createClass(MixinMethods, null, [{
+		key: "getCsvBlob",
+		value: function getCsvBlob(my_array) {
+			var csvContent = "\uFEFF";
+			my_array.forEach(function (infoArray, index) {
+				infoArray.forEach(function (a, i) {
+					csvContent += "\"";
+					csvContent += a.replace(/\r/g, "").replace(/\n/g, "").replace(/"/g, "\"\"");
+					csvContent += i < infoArray.length ? "\"," : "\"";
+				});
+				if (index < my_array.length) {
+					csvContent += "\n";
+				}
+			});
+			return new Blob([csvContent], { type: 'text/csv' });
+		}
+	}]);
+
+	return MixinMethods;
+}();
+
+exports.default = MixinMethods;
+
+/***/ }),
+/* 25 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function ExportComponent(props) {
+	return _react2.default.createElement(
+		'p',
+		null,
+		_react2.default.createElement(
+			'a',
+			{
+				download: props.name,
+				href: URL.createObjectURL(props.blobObject)
+			},
+			props.text
+		)
+	);
+}
+exports.default = ExportComponent;
 
 /***/ })
 /******/ ]);

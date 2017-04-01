@@ -1,4 +1,6 @@
-import MixinMethods from '../mixin.js';
+import MixinMethods from '../mixin/mixin';
+import ColorSet from '../mixin/color-set';
+
 const FrequencyStore = {
 	FrequencyTyping: function(payload, state, target){
 		let query = state.query;
@@ -38,15 +40,17 @@ const FrequencyStore = {
 		query.done.add(term);
 		result.totals[term] = count_result.counter;
 		count_result.result.forEach(function(row, i){
-			let tags = state.directoryMetadata.tags[i];
+			let tag_dict = state.directoryMetadata.tags[i];
 			if(!(i in drawData)){
 				drawData.push({
-					labels: tags.keys(),
+					labels: tag_dict.keys(),
+					datasets: [],
 					csv: null,
-					datasets: []
+					colorController: new ColorSet(false),
 				});
 			}
-			Array.prototype.push.apply(drawData[i].datasets, getChartDataRow(row, tags, term));
+			let obj = drawData[i];
+			Array.prototype.push.apply(obj.datasets, getChartDataRow(tag_dict, row, term, obj.colorController));
 		});
 		drawData.forEach(function(item, i){
 			item.csv = drawDataToCSV(item, state.directoryMetadata.tags[i]);
@@ -57,8 +61,8 @@ const FrequencyStore = {
 		});
 	}
 };
-
 export default FrequencyStore;
+
 function drawDataToCSV(chartData, tagData){
 	let my_array = [[''].concat(chartData.labels)];
 	chartData.datasets.forEach(function(row){
@@ -94,22 +98,16 @@ function occurrencesCounter(texts, string){
 		result: result
 	};
 }
-let colors = [
-	[255,59,48], [90,200,250], [255,149,0], [0,122,255], 
-	[255,204,0], [88,86,214], [76,217,100], [255,45,85],
-	[0,0,0], [158,158,158]
-];
-function getChartDataRow(source, tags, string){
-	let data1 = tags.keys().map(function(t){
+function getChartDataRow(tag_dict, source, string, colors){
+	let data1 = tag_dict.keys().map(function(t){
 		return source[t];
 	});
-	let data2 = tags.keys().map(function(t){
-		return Math.round(source[t]/tags.value(t)*100)/100;
+	let data2 = tag_dict.keys().map(function(t){
+		return Math.round(source[t]/tag_dict.value(t)*100)/100;
 	});
-	let color = colors[0].map(function(x){
+	let color = colors.getColor_array().map(function(x){
 		return x.toString();
 	}).join(',');
-	colors.push(colors.shift());
 	return [
 		{
 			type: 'bar',
