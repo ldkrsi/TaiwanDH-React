@@ -67,9 +67,9 @@ function DirectoryMetadata(props){
 			<dt>載入狀態</dt>
 			<dd>已載入{props.count}個txt檔，共{props.metadata.textCount}個txt檔</dd>
 		</dl>
-		<p><button 
+		<button 
 			className="warning"
 			onClick={Reset}
-		>Reset</button></p>
+		>Reset</button>
 	</div>);
 }

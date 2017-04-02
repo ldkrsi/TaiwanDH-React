@@ -1158,16 +1158,12 @@ function DirectoryMetadata(props) {
 			)
 		),
 		_react2.default.createElement(
-			'p',
-			null,
-			_react2.default.createElement(
-				'button',
-				{
-					className: 'warning',
-					onClick: Reset
-				},
-				'Reset'
-			)
+			'button',
+			{
+				className: 'warning',
+				onClick: Reset
+			},
+			'Reset'
 		)
 	);
 }
