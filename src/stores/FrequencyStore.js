@@ -69,12 +69,10 @@ function drawDataToCSV(chartData, tagData){
 		if(row.type !== 'bar'){
 			return;
 		}
-		my_array.push([row.myID].concat(row.data.map(function(num){
-			return num.toString();
-		})));
+		my_array.push([row.myID].concat(row.data));
 	});
 	my_array.push(['文章總計'].concat(chartData.labels.map(function(item){
-		return tagData.value(item).toString();
+		return tagData.value(item);
 	})));
 	return MixinMethods.getCsvBlob(my_array);
 }

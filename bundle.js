@@ -591,12 +591,10 @@ function drawDataToCSV(chartData, tagData) {
 		if (row.type !== 'bar') {
 			return;
 		}
-		my_array.push([row.myID].concat(row.data.map(function (num) {
-			return num.toString();
-		})));
+		my_array.push([row.myID].concat(row.data));
 	});
 	my_array.push(['文章總計'].concat(chartData.labels.map(function (item) {
-		return tagData.value(item).toString();
+		return tagData.value(item);
 	})));
 	return _mixin2.default.getCsvBlob(my_array);
 }
@@ -760,6 +758,13 @@ var TagDict = function () {
 		value: function value(key) {
 			return this.datastruct[key];
 		}
+	}, {
+		key: "items",
+		value: function items() {
+			return Object.entries(this.datastruct).sort(function (a, b) {
+				return a[0].localeCompare(b[0]);
+			});
+		}
 	}]);
 
 	return TagDict;
@@ -893,9 +898,9 @@ function ResultArea(props) {
 			data: dataset
 		}]
 	};
-	var blob_obj = _mixin2.default.getCsvBlob([[''].concat(keys), ['數量'].concat(dataset.map(function (value) {
-		return value.toString();
-	}))]);
+	var my_array = [['', '數量']];
+	Array.prototype.push.apply(my_array, Object.entries(obj));
+	var blob_obj = _mixin2.default.getCsvBlob(my_array);
 	return _react2.default.createElement(
 		'div',
 		{ className: 'chart-element' },
@@ -1087,10 +1092,9 @@ function DoughnutChart(props) {
 		}]
 	};
 	var options = { animation: { animateRotate: false } };
-	var blob_obj = _mixin2.default.getCsvBlob([[''].concat(keys), ['數量'].concat(data.datasets[0].data.map(function (value) {
-		return value.toString();
-	}))]);
-	var my_array = [];
+	var my_array = [['', '數量']];
+	Array.prototype.push.apply(my_array, tags.items());
+	var blob_obj = _mixin2.default.getCsvBlob(my_array);
 	return _react2.default.createElement(
 		'div',
 		{ className: 'chart-element' },
@@ -1352,6 +1356,9 @@ var MixinMethods = function () {
 			var csvContent = "\uFEFF";
 			my_array.forEach(function (infoArray, index) {
 				infoArray.forEach(function (a, i) {
+					if (typeof a !== 'string') {
+						a = a.toString();
+					}
 					csvContent += "\"";
 					csvContent += a.replace(/\r/g, "").replace(/\n/g, "").replace(/"/g, "\"\"");
 					csvContent += i < infoArray.length ? "\"," : "\"";

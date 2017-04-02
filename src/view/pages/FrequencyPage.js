@@ -47,10 +47,9 @@ function ResultArea(props){
 			data: dataset
 		}]
 	}
-	let blob_obj = MixinMethods.getCsvBlob([
-		[''].concat(keys), 
-		['數量'].concat(dataset.map(function(value){return value.toString();}))
-	]);
+	let my_array = [['','數量']];
+	Array.prototype.push.apply(my_array, Object.entries(obj));
+	let blob_obj = MixinMethods.getCsvBlob(my_array);
 	return(<div className="chart-element">
 		<h2>詞頻統計</h2>
 		<Bar 

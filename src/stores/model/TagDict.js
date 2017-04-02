@@ -18,5 +18,10 @@ class TagDict{
 	value(key){
 		return this.datastruct[key];
 	}
+	items(){
+		return Object.entries(this.datastruct).sort(function(a,b){
+			return a[0].localeCompare(b[0]);
+		});
+	}
 }
 export default TagDict;

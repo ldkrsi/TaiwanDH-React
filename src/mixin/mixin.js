@@ -3,6 +3,9 @@ class MixinMethods{
 		var csvContent = "\uFEFF";
 		my_array.forEach(function(infoArray, index){
 			infoArray.forEach(function(a,i){
+				if(typeof a !== 'string'){
+					a = a.toString();
+				}
 				csvContent+= "\"";
 				csvContent+= a.replace(/\r/g, "").replace(/\n/g, "").replace(/"/g, "\"\"");
 				csvContent+= i < infoArray.length ? "\"," : "\"";

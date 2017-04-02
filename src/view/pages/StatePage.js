@@ -35,11 +35,9 @@ function DoughnutChart(props){
 		}]
 	};
 	let options = {animation: {animateRotate: false}};
-	let blob_obj = MixinMethods.getCsvBlob([
-		[''].concat(keys), 
-		['數量'].concat(data.datasets[0].data.map(function(value){return value.toString();}))
-	]);
-	let my_array = []
+	let my_array = [['','數量']];
+	Array.prototype.push.apply(my_array, tags.items());
+	let blob_obj = MixinMethods.getCsvBlob(my_array);
 	return(<div className="chart-element">
 		<h3>{name}</h3>
 		<Doughnut data={data} options={options}/>
