@@ -29,6 +29,42 @@ function getActions(dispatcher){
 				type: 'FrequencyRemove',
 				payload: term
 			});
+		},
+		AddFilter: function(e){
+			dispatcher.dispatch({
+				type: 'AddFilter',
+				payload: e
+			});
+		},
+		RemoveFilter: function(i){
+			dispatcher.dispatch({
+				type: 'RemoveFilter',
+				payload: i
+			});	
+		},
+		FilterExcludeChange: function(p){
+			dispatcher.dispatch({
+				type: 'FilterExcludeChange',
+				payload: p
+			});
+		},
+		FilterEqualChange: function(p){
+			dispatcher.dispatch({
+				type: 'FilterEqualChange',
+				payload: p
+			});
+		},
+		FilterValueChange: function(p){
+			dispatcher.dispatch({
+				type: 'FilterValueChange',
+				payload: p
+			});
+		},
+		FilterKeyChange: function(p){
+			dispatcher.dispatch({
+				type: 'FilterKeyChange',
+				payload: p
+			});
 		}
 	};
 }

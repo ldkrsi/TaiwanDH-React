@@ -26,7 +26,8 @@ const queryMap = {
 	frequency: function(){
 		return {
 			typing: '',
-			done: new Set()
+			done: new Set(),
+			filters: []
 		};
 	}
 };

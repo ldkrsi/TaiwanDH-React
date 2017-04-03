@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 16);
+/******/ 	return __webpack_require__(__webpack_require__.s = 22);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -74,6 +74,52 @@ module.exports = React;
 
 /***/ }),
 /* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var MixinMethods = function () {
+	function MixinMethods() {
+		_classCallCheck(this, MixinMethods);
+	}
+
+	_createClass(MixinMethods, null, [{
+		key: "getCsvBlob",
+		value: function getCsvBlob(my_array) {
+			var csvContent = "\uFEFF";
+			my_array.forEach(function (infoArray, index) {
+				infoArray.forEach(function (a, i) {
+					if (typeof a !== 'string') {
+						a = a.toString();
+					}
+					csvContent += "\"";
+					csvContent += a.replace(/\r/g, "").replace(/\n/g, "").replace(/"/g, "\"\"");
+					csvContent += i < infoArray.length ? "\"," : "\"";
+				});
+				if (index < my_array.length) {
+					csvContent += "\n";
+				}
+			});
+			return new Blob([csvContent], { type: 'text/csv' });
+		}
+	}]);
+
+	return MixinMethods;
+}();
+
+exports.default = MixinMethods;
+
+/***/ }),
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -111,7 +157,8 @@ var queryMap = {
 	frequency: function frequency() {
 		return {
 			typing: '',
-			done: new Set()
+			done: new Set(),
+			filters: []
 		};
 	}
 };
@@ -131,7 +178,120 @@ function selector(url, dict) {
 }
 
 /***/ }),
-/* 2 */
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var ColorSet = function () {
+	function ColorSet() {
+		var alpha = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+
+		_classCallCheck(this, ColorSet);
+
+		this.grey = 61;
+		this.colors = [[this.grey, this.grey, this.grey], [255, 59, 48], [90, 200, 250], [255, 149, 0], [0, 122, 255], [255, 204, 0], [88, 86, 214], [76, 217, 100], [255, 45, 85]];
+		this.alpha = null;
+		if (alpha) {
+			this.alpha = 1.6;
+		}
+	}
+
+	_createClass(ColorSet, [{
+		key: 'rotate',
+		value: function rotate() {
+			var _this = this;
+
+			var c = this.colors.shift();
+			this.colors.push(c);
+			if (this.alpha === null) {
+				return;
+			}
+			var circle = c.every(function (value) {
+				return value === _this.grey;
+			});
+			if (circle) {
+				this.alpha = this.alpha * 0.625;
+			}
+		}
+	}, {
+		key: 'getColor_array',
+		value: function getColor_array() {
+			this.rotate();
+			if (this.alpha === null) {
+				return this.colors[0].slice();
+			}
+			return this.colors[0].slice().push(this.alpha);
+		}
+	}, {
+		key: 'getColor_rgba',
+		value: function getColor_rgba() {
+			this.rotate();
+			var c = this.colors[0].map(function (x) {
+				return x.toString();
+			}).join(',');
+			if (this.alpha === null) {
+				return 'rgba(' + c + ',1)';
+			}
+			return 'rgba(' + c + ',' + this.alpha.toFixed(3) + ')';
+		}
+	}]);
+
+	return ColorSet;
+}();
+
+exports.default = ColorSet;
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function ExportComponent(props) {
+	return _react2.default.createElement(
+		'p',
+		null,
+		_react2.default.createElement(
+			'a',
+			{
+				download: props.name,
+				href: URL.createObjectURL(props.blobObject)
+			},
+			props.text
+		)
+	);
+}
+exports.default = ExportComponent;
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports) {
+
+module.exports = reactChartjs2;
+
+/***/ }),
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -171,13 +331,49 @@ function getActions(dispatcher) {
 				type: 'FrequencyRemove',
 				payload: term
 			});
+		},
+		AddFilter: function AddFilter(e) {
+			dispatcher.dispatch({
+				type: 'AddFilter',
+				payload: e
+			});
+		},
+		RemoveFilter: function RemoveFilter(i) {
+			dispatcher.dispatch({
+				type: 'RemoveFilter',
+				payload: i
+			});
+		},
+		FilterExcludeChange: function FilterExcludeChange(p) {
+			dispatcher.dispatch({
+				type: 'FilterExcludeChange',
+				payload: p
+			});
+		},
+		FilterEqualChange: function FilterEqualChange(p) {
+			dispatcher.dispatch({
+				type: 'FilterEqualChange',
+				payload: p
+			});
+		},
+		FilterValueChange: function FilterValueChange(p) {
+			dispatcher.dispatch({
+				type: 'FilterValueChange',
+				payload: p
+			});
+		},
+		FilterKeyChange: function FilterKeyChange(p) {
+			dispatcher.dispatch({
+				type: 'FilterKeyChange',
+				payload: p
+			});
 		}
 	};
 }
 exports.default = getActions;
 
 /***/ }),
-/* 3 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -189,15 +385,19 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _AppStore = __webpack_require__(8);
+var _AppStore = __webpack_require__(11);
 
 var _AppStore2 = _interopRequireDefault(_AppStore);
 
-var _RouterStore = __webpack_require__(10);
+var _FilterStore = __webpack_require__(12);
+
+var _FilterStore2 = _interopRequireDefault(_FilterStore);
+
+var _RouterStore = __webpack_require__(14);
 
 var _RouterStore2 = _interopRequireDefault(_RouterStore);
 
-var _FrequencyStore = __webpack_require__(9);
+var _FrequencyStore = __webpack_require__(13);
 
 var _FrequencyStore2 = _interopRequireDefault(_FrequencyStore);
 
@@ -206,7 +406,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function getDispatcher(target) {
-	return new Dispatcher(target, [_AppStore2.default, _RouterStore2.default, _FrequencyStore2.default]);
+	return new Dispatcher(target, [_AppStore2.default, _RouterStore2.default, _FilterStore2.default, _FrequencyStore2.default]);
 }
 exports.default = getDispatcher;
 
@@ -255,7 +455,7 @@ var Dispatcher = function () {
 }();
 
 /***/ }),
-/* 4 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -269,11 +469,11 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _StatePage = __webpack_require__(14);
+var _StatePage = __webpack_require__(21);
 
 var _StatePage2 = _interopRequireDefault(_StatePage);
 
-var _FrequencyPage = __webpack_require__(13);
+var _FrequencyPage = __webpack_require__(20);
 
 var _FrequencyPage2 = _interopRequireDefault(_FrequencyPage);
 
@@ -379,20 +579,19 @@ function DirectoryInput(props) {
 }
 
 /***/ }),
-/* 5 */
+/* 9 */
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
 
 /***/ }),
-/* 6 */
+/* 10 */
 /***/ (function(module, exports) {
 
 module.exports = ReactDOM;
 
 /***/ }),
-/* 7 */,
-/* 8 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -402,11 +601,11 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _TextEntity = __webpack_require__(12);
+var _TextEntity = __webpack_require__(17);
 
 var _TextEntity2 = _interopRequireDefault(_TextEntity);
 
-var _TagDict = __webpack_require__(11);
+var _TagDict = __webpack_require__(16);
 
 var _TagDict2 = _interopRequireDefault(_TagDict);
 
@@ -479,7 +678,7 @@ function read_file(file, target) {
 }
 
 /***/ }),
-/* 9 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -489,11 +688,57 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _mixin = __webpack_require__(24);
+var _Filter = __webpack_require__(15);
+
+var _Filter2 = _interopRequireDefault(_Filter);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var FilterStore = {
+	AddFilter: function AddFilter(payload, state, target) {
+		state.query.filters.push(new _Filter2.default(true, 0, true, state.directoryMetadata.tags[0].keys()[0]));
+		target.setState({ query: state.query });
+	},
+	RemoveFilter: function RemoveFilter(payload, state, target) {
+		state.query.filters.splice(parseInt(payload), 1);
+		target.setState({ query: state.query });
+	},
+	FilterExcludeChange: function FilterExcludeChange(payload, state, target) {
+		state.query.filters[payload.index].setExclude(payload.value);
+		target.setState({ query: state.query });
+	},
+	FilterEqualChange: function FilterEqualChange(payload, state, target) {
+		state.query.filters[payload.index].setEqual(payload.value);
+		target.setState({ query: state.query });
+	},
+	FilterValueChange: function FilterValueChange(payload, state, target) {
+		state.query.filters[payload.index].setValue(payload.value);
+		target.setState({ query: state.query });
+	},
+	FilterKeyChange: function FilterKeyChange(payload, state, target) {
+		state.query.filters[payload.index].setKey(payload.value, state.directoryMetadata.tags[payload.value].keys()[0]);
+		target.setState({ query: state.query });
+	}
+};
+
+exports.default = FilterStore;
+
+/***/ }),
+/* 13 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _mixin = __webpack_require__(1);
 
 var _mixin2 = _interopRequireDefault(_mixin);
 
-var _colorSet = __webpack_require__(23);
+var _colorSet = __webpack_require__(3);
 
 var _colorSet2 = _interopRequireDefault(_colorSet);
 
@@ -689,7 +934,7 @@ function getChartDataRow(tag_dict, source, string, colors) {
 }
 
 /***/ }),
-/* 10 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -699,7 +944,7 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _States = __webpack_require__(1);
+var _States = __webpack_require__(2);
 
 var _States2 = _interopRequireDefault(_States);
 
@@ -713,7 +958,76 @@ var RouterStore = {
 exports.default = RouterStore;
 
 /***/ }),
-/* 11 */
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Filter = function () {
+	function Filter(_exclude, _key, _equal, _value) {
+		_classCallCheck(this, Filter);
+
+		this.exclude = _exclude;
+		this.key = _key;
+		this.equal = _equal;
+		this.value = _value;
+	}
+
+	_createClass(Filter, [{
+		key: 'is_exclude',
+		value: function is_exclude() {
+			if (this.exclude) {
+				return '1';
+			}
+			return '0';
+		}
+	}, {
+		key: 'is_equal',
+		value: function is_equal() {
+			if (this.equal) {
+				return '1';
+			}
+			return '0';
+		}
+	}, {
+		key: 'setExclude',
+		value: function setExclude(v) {
+			this.exclude = v === '1';
+		}
+	}, {
+		key: 'setEqual',
+		value: function setEqual(v) {
+			this.equal = v === '1';
+		}
+	}, {
+		key: 'setValue',
+		value: function setValue(v) {
+			this.value = v;
+		}
+	}, {
+		key: 'setKey',
+		value: function setKey(k, v) {
+			this.key = k;
+			this.value = v;
+		}
+	}]);
+
+	return Filter;
+}();
+
+exports.default = Filter;
+
+/***/ }),
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -773,7 +1087,7 @@ var TagDict = function () {
 exports.default = TagDict;
 
 /***/ }),
-/* 12 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -813,7 +1127,7 @@ var TextEntity = function () {
 exports.default = TextEntity;
 
 /***/ }),
-/* 13 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -827,13 +1141,176 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactChartjs = __webpack_require__(15);
+var _removeComponent = __webpack_require__(19);
 
-var _exportComponent = __webpack_require__(25);
+var _removeComponent2 = _interopRequireDefault(_removeComponent);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function FilterComponent(props) {
+	return _react2.default.createElement(
+		'div',
+		null,
+		_react2.default.createElement(
+			'h3',
+			null,
+			'\u7BE9\u9078\u5668'
+		),
+		props.filters.map(function (item, i) {
+			return _react2.default.createElement(FilterItem, {
+				key: i,
+				myIndex: i,
+				filter: item,
+				tags: props.tags,
+				actions: props.actions
+			});
+		}),
+		_react2.default.createElement(
+			'button',
+			{
+				onClick: props.actions.AddFilter
+			},
+			'+\u65B0\u589E\u689D\u4EF6'
+		)
+	);
+}
+exports.default = FilterComponent;
+
+
+function FilterItem(props) {
+	var filter = props.filter;
+	var tags = props.tags;
+	var onRemoveClick = function onRemoveClick(index) {
+		props.actions.RemoveFilter(parseInt(index));
+	};
+	var onExcludeChange = function onExcludeChange(e) {
+		props.actions.FilterExcludeChange({ index: props.myIndex, value: e.target.value });
+	};
+	var onEqualChange = function onEqualChange(e) {
+		props.actions.FilterEqualChange({ index: props.myIndex, value: e.target.value });
+	};
+	var onValueChange = function onValueChange(e) {
+		props.actions.FilterValueChange({ index: props.myIndex, value: e.target.value });
+	};
+	var onKeyChange = function onKeyChange(e) {
+		props.actions.FilterKeyChange({ index: props.myIndex, value: parseInt(e.target.value) });
+	};
+	return _react2.default.createElement(
+		'div',
+		null,
+		_react2.default.createElement(
+			'select',
+			{ value: filter.is_exclude(), onChange: onExcludeChange },
+			_react2.default.createElement(
+				'option',
+				{ value: '1' },
+				'\u6392\u9664'
+			),
+			_react2.default.createElement(
+				'option',
+				{ value: '0' },
+				'\u5305\u542B'
+			)
+		),
+		_react2.default.createElement(
+			'select',
+			{ value: filter.key.toString(), onChange: onKeyChange },
+			tags.map(function (row, i) {
+				return _react2.default.createElement(
+					'option',
+					{ key: i, value: i.toString() },
+					'第' + (i + 1).toString() + '層'
+				);
+			})
+		),
+		_react2.default.createElement(
+			'select',
+			{ value: filter.is_equal(), onChange: onEqualChange },
+			_react2.default.createElement(
+				'option',
+				{ value: '1' },
+				'\u7B49\u65BC'
+			),
+			_react2.default.createElement(
+				'option',
+				{ value: '0' },
+				'\u4E0D\u7B49\u65BC'
+			)
+		),
+		_react2.default.createElement(
+			'select',
+			{ value: filter.value, onChange: onValueChange },
+			tags[filter.key].keys().map(function (k, i) {
+				return _react2.default.createElement(
+					'option',
+					{ key: i, value: k },
+					k
+				);
+			})
+		),
+		_react2.default.createElement(_removeComponent2.default, { myValue: props.myIndex, action: onRemoveClick })
+	);
+}
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function RemoveComponent(props) {
+	var onClickFunction = function onClickFunction(e) {
+		props.action(e.target.dataset.value);
+	};
+	return _react2.default.createElement(
+		"span",
+		{ className: "remove-x",
+			"data-value": props.myValue,
+			onClick: onClickFunction
+		},
+		"\u2716"
+	);
+}
+
+exports.default = RemoveComponent;
+
+/***/ }),
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactChartjs = __webpack_require__(5);
+
+var _exportComponent = __webpack_require__(4);
 
 var _exportComponent2 = _interopRequireDefault(_exportComponent);
 
-var _mixin = __webpack_require__(24);
+var _filterComponent = __webpack_require__(18);
+
+var _filterComponent2 = _interopRequireDefault(_filterComponent);
+
+var _mixin = __webpack_require__(1);
 
 var _mixin2 = _interopRequireDefault(_mixin);
 
@@ -841,11 +1318,17 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function FrequencyPage(props) {
 	var state = props.state;
+	var filter = _react2.default.createElement(_filterComponent2.default, {
+		filters: state.query.filters,
+		tags: state.directoryMetadata.tags,
+		actions: props.actions
+	});
 	if (state.query.done.size === 0) {
 		return _react2.default.createElement(
 			'div',
 			null,
-			_react2.default.createElement(InputArea, props)
+			_react2.default.createElement(InputArea, props),
+			filter
 		);
 	}
 	var result = [];
@@ -867,6 +1350,7 @@ function FrequencyPage(props) {
 		null,
 		_react2.default.createElement(InputArea, props),
 		_react2.default.createElement(InputedArea, props),
+		filter,
 		_react2.default.createElement(ResultArea, { totals: state.result.totals }),
 		result.map(function (item) {
 			return item;
@@ -1020,7 +1504,7 @@ function InputArea(props) {
 }
 
 /***/ }),
-/* 14 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1034,17 +1518,17 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactChartjs = __webpack_require__(15);
+var _reactChartjs = __webpack_require__(5);
 
-var _colorSet = __webpack_require__(23);
+var _colorSet = __webpack_require__(3);
 
 var _colorSet2 = _interopRequireDefault(_colorSet);
 
-var _exportComponent = __webpack_require__(25);
+var _exportComponent = __webpack_require__(4);
 
 var _exportComponent2 = _interopRequireDefault(_exportComponent);
 
-var _mixin = __webpack_require__(24);
+var _mixin = __webpack_require__(1);
 
 var _mixin2 = _interopRequireDefault(_mixin);
 
@@ -1173,13 +1657,7 @@ function DirectoryMetadata(props) {
 }
 
 /***/ }),
-/* 15 */
-/***/ (function(module, exports) {
-
-module.exports = reactChartjs2;
-
-/***/ }),
-/* 16 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1187,29 +1665,29 @@ module.exports = reactChartjs2;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-__webpack_require__(5);
+__webpack_require__(9);
 
 var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactDom = __webpack_require__(6);
+var _reactDom = __webpack_require__(10);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
-var _States = __webpack_require__(1);
+var _States = __webpack_require__(2);
 
 var _States2 = _interopRequireDefault(_States);
 
-var _AppView = __webpack_require__(4);
+var _AppView = __webpack_require__(8);
 
 var _AppView2 = _interopRequireDefault(_AppView);
 
-var _Dispatcher = __webpack_require__(3);
+var _Dispatcher = __webpack_require__(7);
 
 var _Dispatcher2 = _interopRequireDefault(_Dispatcher);
 
-var _Action = __webpack_require__(2);
+var _Action = __webpack_require__(6);
 
 var _Action2 = _interopRequireDefault(_Action);
 
@@ -1249,165 +1727,6 @@ var AppContainer = function (_React$Component) {
 }(_react2.default.Component);
 
 _reactDom2.default.render(_react2.default.createElement(AppContainer, null), document.getElementById('app'));
-
-/***/ }),
-/* 17 */,
-/* 18 */,
-/* 19 */,
-/* 20 */,
-/* 21 */,
-/* 22 */,
-/* 23 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var ColorSet = function () {
-	function ColorSet() {
-		var alpha = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
-
-		_classCallCheck(this, ColorSet);
-
-		this.grey = 61;
-		this.colors = [[this.grey, this.grey, this.grey], [255, 59, 48], [90, 200, 250], [255, 149, 0], [0, 122, 255], [255, 204, 0], [88, 86, 214], [76, 217, 100], [255, 45, 85]];
-		this.alpha = null;
-		if (alpha) {
-			this.alpha = 1.6;
-		}
-	}
-
-	_createClass(ColorSet, [{
-		key: 'rotate',
-		value: function rotate() {
-			var _this = this;
-
-			var c = this.colors.shift();
-			this.colors.push(c);
-			if (this.alpha === null) {
-				return;
-			}
-			var circle = c.every(function (value) {
-				return value === _this.grey;
-			});
-			if (circle) {
-				this.alpha = this.alpha * 0.625;
-			}
-		}
-	}, {
-		key: 'getColor_array',
-		value: function getColor_array() {
-			this.rotate();
-			if (this.alpha === null) {
-				return this.colors[0].slice();
-			}
-			return this.colors[0].slice().push(this.alpha);
-		}
-	}, {
-		key: 'getColor_rgba',
-		value: function getColor_rgba() {
-			this.rotate();
-			var c = this.colors[0].map(function (x) {
-				return x.toString();
-			}).join(',');
-			if (this.alpha === null) {
-				return 'rgba(' + c + ',1)';
-			}
-			return 'rgba(' + c + ',' + this.alpha.toFixed(3) + ')';
-		}
-	}]);
-
-	return ColorSet;
-}();
-
-exports.default = ColorSet;
-
-/***/ }),
-/* 24 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var MixinMethods = function () {
-	function MixinMethods() {
-		_classCallCheck(this, MixinMethods);
-	}
-
-	_createClass(MixinMethods, null, [{
-		key: "getCsvBlob",
-		value: function getCsvBlob(my_array) {
-			var csvContent = "\uFEFF";
-			my_array.forEach(function (infoArray, index) {
-				infoArray.forEach(function (a, i) {
-					if (typeof a !== 'string') {
-						a = a.toString();
-					}
-					csvContent += "\"";
-					csvContent += a.replace(/\r/g, "").replace(/\n/g, "").replace(/"/g, "\"\"");
-					csvContent += i < infoArray.length ? "\"," : "\"";
-				});
-				if (index < my_array.length) {
-					csvContent += "\n";
-				}
-			});
-			return new Blob([csvContent], { type: 'text/csv' });
-		}
-	}]);
-
-	return MixinMethods;
-}();
-
-exports.default = MixinMethods;
-
-/***/ }),
-/* 25 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _react = __webpack_require__(0);
-
-var _react2 = _interopRequireDefault(_react);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function ExportComponent(props) {
-	return _react2.default.createElement(
-		'p',
-		null,
-		_react2.default.createElement(
-			'a',
-			{
-				download: props.name,
-				href: URL.createObjectURL(props.blobObject)
-			},
-			props.text
-		)
-	);
-}
-exports.default = ExportComponent;
 
 /***/ })
 /******/ ]);

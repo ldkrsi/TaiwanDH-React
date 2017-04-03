@@ -1,11 +1,13 @@
 import AppStore from './stores/AppStore';
+import FilterStore from './stores/FilterStore';
 import RouterStore from './stores/RouterStore';
 import FrequencyStore from './stores/FrequencyStore';
 
 function getDispatcher(target){
 	return new Dispatcher(target, [
-		AppStore, 
+		AppStore,
 		RouterStore,
+		FilterStore,
 		FrequencyStore,
 	]);
 }

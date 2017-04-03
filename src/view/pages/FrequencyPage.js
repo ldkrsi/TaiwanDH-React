@@ -1,12 +1,21 @@
 import React from 'react';
 import {Bar} from 'react-chartjs-2';
 import ExportComponent from '../components/export-component';
+import FilterComponent from '../components/filter-component';
 import MixinMethods from '../../mixin/mixin';
 
 function FrequencyPage(props){
 	let state = props.state;
+	let filter = <FilterComponent 
+		filters={state.query.filters} 
+		tags={state.directoryMetadata.tags}
+		actions={props.actions}
+	/>;
 	if(state.query.done.size === 0){
-		return(<div><InputArea {...props} /></div>);
+		return(<div>
+			<InputArea {...props} />
+			{filter}
+		</div>);
 	}
 	let result = [];
 	if(state.result.drawData.length > 0){
@@ -21,6 +30,7 @@ function FrequencyPage(props){
 	return(<div>
 		<InputArea {...props} />
 		<InputedArea {...props} />
+		{filter}
 		<ResultArea totals={state.result.totals} />
 		{result.map(function(item){return item;})}
 	</div>);
