@@ -20,6 +20,9 @@ button.warning
 		@include white
 		@include red-bg
 
+button.small
+	min-width: 28px
+
 ul.term-list-small
 	@include clear-both
 	@include font-small-body
@@ -47,3 +50,30 @@ span.remove-x
 	padding-top: 10px
 	padding-bottom: 10px
 	margin-bottom: 15px
+
+.filter-component
+	.filter-li
+		display: table
+		box-sizing: border-box
+		text-align: right
+		padding-right: 15px
+		min-width: 441px
+		margin-bottom: 8px
+		padding-bottom: 8px
+		border-bottom: 1px solid #e6e6e6;
+		select
+			@include font-x-small-body
+			margin-right: 13px
+			padding: 3px 5px
+		select:nth-child(4)
+			width: 106px
+	.filter-li:not(:nth-of-type(1))
+		&:before
+			@include font-x-small-body
+			display: inline
+			content: '且'
+			margin-right: 13px
+
+.button-group
+	button
+		margin-right: 13px

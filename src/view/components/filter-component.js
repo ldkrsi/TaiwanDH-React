@@ -2,9 +2,10 @@ import React from 'react';
 import RemoveComponent from './remove-component';
 
 function FilterComponent(props){
-	return(<div>
+	const filters = props.filters;
+	return(<div className="filter-component">
 		<h3>篩選器</h3>
-		{props.filters.map((item, i) => {
+		{filters.map((item, i) => {
 			return(<FilterItem 
 				key={i}
 				myIndex={i}
@@ -13,9 +14,12 @@ function FilterComponent(props){
 				actions={props.actions}
 			/>);
 		})}
-		<button
-			onClick={props.actions.AddFilter}
-		>+新增條件</button>
+		<div className="button-group">
+			<button className="small"
+				onClick={props.actions.AddFilter}
+			>{filters.length > 0 ? '+' : '新增'}</button>
+			{filters.length > 0 ? <button>Apply</button> : ''}
+		</div>
 	</div>);
 }
 export default FilterComponent;
@@ -38,7 +42,7 @@ function FilterItem(props){
 	const onKeyChange = (e) => {
 		props.actions.FilterKeyChange({index: props.myIndex, value: parseInt(e.target.value)});
 	}
-	return(<div>
+	return(<div className="filter-li">
 		<select value={filter.is_exclude()} onChange={onExcludeChange}>
 			<option value="1">排除</option>
 			<option value="0">包含</option>

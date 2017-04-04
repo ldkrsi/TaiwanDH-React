@@ -4,6 +4,12 @@
 	letter-spacing: $tracking / 1000
 	font-weight: $weight
 
+@mixin font-x-small-body
+	@include font-typography(14px, 19px, -11em, 400)
+
+@mixin font-x-small-caption
+	@include font-typography(11px, 13px, -6em, 400)
+
 @mixin font-normal-body
 	@include font-typography(16px, 21px, -20em, 400)
 

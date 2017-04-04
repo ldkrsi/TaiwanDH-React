@@ -1148,15 +1148,16 @@ var _removeComponent2 = _interopRequireDefault(_removeComponent);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function FilterComponent(props) {
+	var filters = props.filters;
 	return _react2.default.createElement(
 		'div',
-		null,
+		{ className: 'filter-component' },
 		_react2.default.createElement(
 			'h3',
 			null,
 			'\u7BE9\u9078\u5668'
 		),
-		props.filters.map(function (item, i) {
+		filters.map(function (item, i) {
 			return _react2.default.createElement(FilterItem, {
 				key: i,
 				myIndex: i,
@@ -1166,11 +1167,20 @@ function FilterComponent(props) {
 			});
 		}),
 		_react2.default.createElement(
-			'button',
-			{
-				onClick: props.actions.AddFilter
-			},
-			'+\u65B0\u589E\u689D\u4EF6'
+			'div',
+			{ className: 'button-group' },
+			_react2.default.createElement(
+				'button',
+				{ className: 'small',
+					onClick: props.actions.AddFilter
+				},
+				filters.length > 0 ? '+' : '新增'
+			),
+			filters.length > 0 ? _react2.default.createElement(
+				'button',
+				null,
+				'Apply'
+			) : ''
 		)
 	);
 }
@@ -1197,7 +1207,7 @@ function FilterItem(props) {
 	};
 	return _react2.default.createElement(
 		'div',
-		null,
+		{ className: 'filter-li' },
 		_react2.default.createElement(
 			'select',
 			{ value: filter.is_exclude(), onChange: onExcludeChange },
