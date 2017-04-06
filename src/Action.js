@@ -65,6 +65,12 @@ function getActions(dispatcher){
 				type: 'FilterKeyChange',
 				payload: p
 			});
+		},
+		FiltersApply: function(p){
+			dispatcher.dispatch({
+				type: 'FiltersApply',
+				payload: p
+			});
 		}
 	};
 }

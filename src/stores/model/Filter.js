@@ -30,5 +30,8 @@ class Filter{
 		this.key = k;
 		this.value = v;
 	}
+	passFilter(value){
+		return this.exclude ^ (!(this.equal ^ (value === this.value)));
+	}
 }
 export default Filter;

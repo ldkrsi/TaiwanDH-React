@@ -3,6 +3,7 @@ import RemoveComponent from './remove-component';
 
 function FilterComponent(props){
 	const filters = props.filters;
+	const applyBtn = <button onClick={props.actions.FiltersApply}>Apply</button>;
 	return(<div className="filter-component">
 		<h3>篩選器</h3>
 		{filters.map((item, i) => {
@@ -17,8 +18,8 @@ function FilterComponent(props){
 		<div className="button-group">
 			<button className="small"
 				onClick={props.actions.AddFilter}
-			>{filters.length > 0 ? '+' : '新增'}</button>
-			{filters.length > 0 ? <button>Apply</button> : ''}
+			>+</button>
+			{applyBtn}
 		</div>
 	</div>);
 }

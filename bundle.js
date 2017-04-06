@@ -367,6 +367,12 @@ function getActions(dispatcher) {
 				type: 'FilterKeyChange',
 				payload: p
 			});
+		},
+		FiltersApply: function FiltersApply(p) {
+			dispatcher.dispatch({
+				type: 'FiltersApply',
+				payload: p
+			});
 		}
 	};
 }
@@ -800,29 +806,54 @@ var FrequencyStore = {
 		if (term.length === 0) {
 			return;
 		}
-		var drawData = result.drawData;
-		var count_result = occurrencesCounter(state.database, term);
 		query.typing = '';
 		query.done.add(term);
-		result.totals[term] = count_result.counter;
-		count_result.result.forEach(function (row, i) {
-			var tag_dict = state.directoryMetadata.tags[i];
-			if (!(i in drawData)) {
-				drawData.push({
-					labels: tag_dict.keys(),
-					datasets: [],
-					csv: null,
-					colorController: new _colorSet2.default(false)
-				});
-			}
-			var obj = drawData[i];
-			Array.prototype.push.apply(obj.datasets, getChartDataRow(tag_dict, row, term, obj.colorController));
-		});
-		drawData.forEach(function (item, i) {
-			item.csv = drawDataToCSV(item, state.directoryMetadata.tags[i]);
+		var tag_set = state.directoryMetadata.tags;
+		mergeResult(term, result, occurrencesCounter(state.database, term, query.filters), tag_set);
+		result.drawData.forEach(function (item, i) {
+			item.csv = drawDataToCSV(item, tag_set[i]);
 		});
 		target.setState({
 			query: query,
+			result: result
+		});
+	},
+	FiltersApply: function FiltersApply(payload, state, target) {
+		var query = state.query,
+		    result = state.result;
+		if (query.done.size === 0) {
+			return;
+		}
+		result.drawData = [];
+		var _iteratorNormalCompletion2 = true;
+		var _didIteratorError2 = false;
+		var _iteratorError2 = undefined;
+
+		try {
+			for (var _iterator2 = query.done[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+				var term = _step2.value;
+
+				mergeResult(term, result, occurrencesCounter(state.database, term, query.filters), state.directoryMetadata.tags);
+			}
+		} catch (err) {
+			_didIteratorError2 = true;
+			_iteratorError2 = err;
+		} finally {
+			try {
+				if (!_iteratorNormalCompletion2 && _iterator2.return) {
+					_iterator2.return();
+				}
+			} finally {
+				if (_didIteratorError2) {
+					throw _iteratorError2;
+				}
+			}
+		}
+
+		result.drawData.forEach(function (item, i) {
+			item.csv = drawDataToCSV(item, state.directoryMetadata.tags[i]);
+		});
+		target.setState({
 			result: result
 		});
 	}
@@ -843,19 +874,47 @@ function drawDataToCSV(chartData, tagData) {
 	})));
 	return _mixin2.default.getCsvBlob(my_array);
 }
-function occurrencesCounter(texts, string) {
+function mergeResult(term, result, count_result, tags) {
+	var drawData = result.drawData;
+	count_result.result.forEach(function (row, i) {
+		var keys = Object.keys(row).sort();
+		if (!(i in drawData)) {
+			drawData.push({
+				labels: keys,
+				datasets: [],
+				csv: null,
+				colorController: new _colorSet2.default(false)
+			});
+		}
+		var obj = drawData[i];
+		pushChartDataRow(row, term, obj.datasets, {
+			key_order: keys,
+			colors: obj.colorController,
+			tag_dict: tags[i]
+		});
+	});
+	result.totals[term] = count_result.counter;
+}
+function occurrencesCounter(texts, string, filters) {
 	var result = [],
 	    counter = 0;
-	var _iteratorNormalCompletion2 = true;
-	var _didIteratorError2 = false;
-	var _iteratorError2 = undefined;
+	var _iteratorNormalCompletion3 = true;
+	var _didIteratorError3 = false;
+	var _iteratorError3 = undefined;
 
 	try {
 		var _loop = function _loop() {
-			var text = _step2.value;
+			var text = _step3.value;
 
+			var tags = text.metadata.tags;
+			var pass = filters.every(function (f) {
+				return f.passFilter(tags[f.key]);
+			});
+			if (!pass) {
+				return 'continue';
+			}
 			var c = text.occurrences(string);
-			text.metadata.tags.forEach(function (tag, i) {
+			tags.forEach(function (tag, i) {
 				if (!(i in result)) {
 					result.push({});
 				}
@@ -867,20 +926,22 @@ function occurrencesCounter(texts, string) {
 			counter += c;
 		};
 
-		for (var _iterator2 = texts[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-			_loop();
+		for (var _iterator3 = texts[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+			var _ret = _loop();
+
+			if (_ret === 'continue') continue;
 		}
 	} catch (err) {
-		_didIteratorError2 = true;
-		_iteratorError2 = err;
+		_didIteratorError3 = true;
+		_iteratorError3 = err;
 	} finally {
 		try {
-			if (!_iteratorNormalCompletion2 && _iterator2.return) {
-				_iterator2.return();
+			if (!_iteratorNormalCompletion3 && _iterator3.return) {
+				_iterator3.return();
 			}
 		} finally {
-			if (_didIteratorError2) {
-				throw _iteratorError2;
+			if (_didIteratorError3) {
+				throw _iteratorError3;
 			}
 		}
 	}
@@ -890,17 +951,18 @@ function occurrencesCounter(texts, string) {
 		result: result
 	};
 }
-function getChartDataRow(tag_dict, source, string, colors) {
-	var data1 = tag_dict.keys().map(function (t) {
-		return source[t];
+function pushChartDataRow(source, string, target, args) {
+	var data1 = [],
+	    data2 = [];
+	args.key_order.forEach(function (t) {
+		var v = source[t];
+		data1.push(v);
+		data2.push(Math.round(v / args.tag_dict.value(t) * 100) / 100);
 	});
-	var data2 = tag_dict.keys().map(function (t) {
-		return Math.round(source[t] / tag_dict.value(t) * 100) / 100;
-	});
-	var color = colors.getColor_array().map(function (x) {
+	var color = args.colors.getColor_array().map(function (x) {
 		return x.toString();
 	}).join(',');
-	return [{
+	target.push({
 		type: 'bar',
 		yAxisID: 'y-axis-1',
 		borderWidth: 1,
@@ -911,7 +973,8 @@ function getChartDataRow(tag_dict, source, string, colors) {
 		myID: string,
 		label: string + " (累計)",
 		data: data1
-	}, {
+	});
+	target.push({
 		type: 'line',
 		yAxisID: 'y-axis-2',
 		fill: false,
@@ -930,7 +993,7 @@ function getChartDataRow(tag_dict, source, string, colors) {
 		myID: string,
 		label: string + " (比率)",
 		data: data2
-	}];
+	});
 }
 
 /***/ }),
@@ -1018,6 +1081,11 @@ var Filter = function () {
 		value: function setKey(k, v) {
 			this.key = k;
 			this.value = v;
+		}
+	}, {
+		key: 'passFilter',
+		value: function passFilter(value) {
+			return this.exclude ^ !(this.equal ^ value === this.value);
 		}
 	}]);
 
@@ -1149,6 +1217,11 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function FilterComponent(props) {
 	var filters = props.filters;
+	var applyBtn = _react2.default.createElement(
+		'button',
+		{ onClick: props.actions.FiltersApply },
+		'Apply'
+	);
 	return _react2.default.createElement(
 		'div',
 		{ className: 'filter-component' },
@@ -1174,13 +1247,9 @@ function FilterComponent(props) {
 				{ className: 'small',
 					onClick: props.actions.AddFilter
 				},
-				filters.length > 0 ? '+' : '新增'
+				'+'
 			),
-			filters.length > 0 ? _react2.default.createElement(
-				'button',
-				null,
-				'Apply'
-			) : ''
+			applyBtn
 		)
 	);
 }
