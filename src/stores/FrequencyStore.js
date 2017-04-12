@@ -2,12 +2,12 @@ import MixinMethods from '../mixin/mixin';
 import ColorSet from '../mixin/color-set';
 
 const FrequencyStore = {
-	FrequencyTyping: function(payload, state, target){
+	FrequencyTyping: function(payload, state, setState){
 		let query = state.query;
 		query.typing = payload;
-		target.setState({query: query});
+		setState({query: query});
 	},
-	FrequencyRemove: function(payload, state, target){
+	FrequencyRemove: function(payload, state, setState){
 		let query = state.query;
 		let result = state.result;
 		query.done.delete(payload);
@@ -23,12 +23,9 @@ const FrequencyStore = {
 		result.drawData.forEach(function(item, i){
 			item.csv = drawDataToCSV(item, state.directoryMetadata.tags[i]);
 		});
-		target.setState({
-			query: query,
-			result: result
-		});
+		setState({query: query, result: result});
 	},
-	FrequencySubmit: function(payload, state, target){
+	FrequencySubmit: function(payload, state, setState){
 		let query = state.query, result = state.result;
 		let term = query.typing.trim();
 		if(term.length === 0){
@@ -44,12 +41,9 @@ const FrequencyStore = {
 		result.drawData.forEach(function(item, i){
 			item.csv = drawDataToCSV(item, tag_set[i]);
 		});
-		target.setState({
-			query: query,
-			result: result
-		});
+		setState({query: query, result: result});
 	},
-	FiltersApply: function(payload, state, target){
+	FiltersApply: function(payload, state, setState){
 		let query = state.query, result = state.result;
 		if(query.done.size === 0){
 			return;
@@ -64,9 +58,7 @@ const FrequencyStore = {
 		result.drawData.forEach(function(item, i){
 			item.csv = drawDataToCSV(item, state.directoryMetadata.tags[i]);
 		});
-		target.setState({
-			result: result
-		});
+		setState({result: result});
 	}
 };
 export default FrequencyStore;

@@ -198,11 +198,16 @@ var all_stores = {
 
 var Dispatcher = function () {
 	function Dispatcher(component, stores) {
+		var _this = this;
+
 		_classCallCheck(this, Dispatcher);
 
 		this.component = component;
 		this.stores = stores;
 		this.now_url = null;
+		this.setState = function (dict) {
+			_this.component.setState(dict);
+		};
 	}
 
 	_createClass(Dispatcher, [{
@@ -213,25 +218,25 @@ var Dispatcher = function () {
 	}, {
 		key: 'dispatch',
 		value: function dispatch(command) {
-			var _this = this;
+			var _this2 = this;
 
 			this.stores.global.forEach(function (store) {
-				_this.run_command(store, command);
+				_this2.runCommand(store, command);
 			});
 			if (!(this.now_url in this.stores.pages)) {
 				return;
 			}
 			this.stores.pages[this.now_url].forEach(function (store) {
-				_this.run_command(store, command);
+				_this2.runCommand(store, command);
 			});
 		}
 	}, {
-		key: 'run_command',
-		value: function run_command(store, command) {
+		key: 'runCommand',
+		value: function runCommand(store, command) {
 			if (!(command.type in store)) {
 				return;
 			}
-			store[command.type](command.payload, this.component.state, this.component);
+			store[command.type](command.payload, this.component.state, this.setState, this.component);
 		}
 	}]);
 
@@ -476,8 +481,8 @@ var _TagDict2 = _interopRequireDefault(_TagDict);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var AppStore = {
-	InputDirChange: function InputDirChange(payload, state, target) {
-		target.setState({ database: [] });
+	InputDirChange: function InputDirChange(payload, state, setState, target) {
+		setState({ database: [] });
 		var files = payload.target.files;
 		var counter = 0,
 		    deep = 0,
@@ -493,7 +498,7 @@ var AppStore = {
 				if (f.type !== 'text/plain') {
 					continue;
 				}
-				read_file(f, target);
+				read_file(f, setState, target);
 				counter += 1;
 				deep = Math.max(deep, f.webkitRelativePath.split("/").length - 2);
 				f.webkitRelativePath.split("/").slice(1, -1).forEach(function (item, i) {
@@ -518,7 +523,7 @@ var AppStore = {
 			}
 		}
 
-		target.setState({
+		setState({
 			directoryMetadata: {
 				name: files[0].webkitRelativePath.split("/")[0],
 				textCount: counter,
@@ -532,11 +537,11 @@ var AppStore = {
 exports.default = AppStore;
 
 
-function read_file(file, target) {
+function read_file(file, setState, target) {
 	var reader = new FileReader();
 	reader.onload = function (evt) {
 		var text = new _TextEntity2.default(file, evt.target.result);
-		target.setState({ database: target.state.database.concat([text]) });
+		setState({ database: target.state.database.concat([text]) });
 	};
 	reader.readAsText(file);
 }
@@ -559,29 +564,29 @@ var _Filter2 = _interopRequireDefault(_Filter);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var FilterStore = {
-	AddFilter: function AddFilter(payload, state, target) {
+	AddFilter: function AddFilter(payload, state, setState) {
 		state.query.filters.push(new _Filter2.default(true, 0, true, state.directoryMetadata.tags[0].keys()[0]));
-		target.setState({ query: state.query });
+		setState({ query: state.query });
 	},
-	RemoveFilter: function RemoveFilter(payload, state, target) {
+	RemoveFilter: function RemoveFilter(payload, state, setState) {
 		state.query.filters.splice(parseInt(payload), 1);
-		target.setState({ query: state.query });
+		setState({ query: state.query });
 	},
-	FilterExcludeChange: function FilterExcludeChange(payload, state, target) {
+	FilterExcludeChange: function FilterExcludeChange(payload, state, setState) {
 		state.query.filters[payload.index].setExclude(payload.value);
-		target.setState({ query: state.query });
+		setState({ query: state.query });
 	},
-	FilterEqualChange: function FilterEqualChange(payload, state, target) {
+	FilterEqualChange: function FilterEqualChange(payload, state, setState) {
 		state.query.filters[payload.index].setEqual(payload.value);
-		target.setState({ query: state.query });
+		setState({ query: state.query });
 	},
-	FilterValueChange: function FilterValueChange(payload, state, target) {
+	FilterValueChange: function FilterValueChange(payload, state, setState) {
 		state.query.filters[payload.index].setValue(payload.value);
-		target.setState({ query: state.query });
+		setState({ query: state.query });
 	},
-	FilterKeyChange: function FilterKeyChange(payload, state, target) {
+	FilterKeyChange: function FilterKeyChange(payload, state, setState) {
 		state.query.filters[payload.index].setKey(payload.value, state.directoryMetadata.tags[payload.value].keys()[0]);
-		target.setState({ query: state.query });
+		setState({ query: state.query });
 	}
 };
 
@@ -609,12 +614,12 @@ var _colorSet2 = _interopRequireDefault(_colorSet);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var FrequencyStore = {
-	FrequencyTyping: function FrequencyTyping(payload, state, target) {
+	FrequencyTyping: function FrequencyTyping(payload, state, setState) {
 		var query = state.query;
 		query.typing = payload;
-		target.setState({ query: query });
+		setState({ query: query });
 	},
-	FrequencyRemove: function FrequencyRemove(payload, state, target) {
+	FrequencyRemove: function FrequencyRemove(payload, state, setState) {
 		var query = state.query;
 		var result = state.result;
 		query.done.delete(payload);
@@ -652,12 +657,9 @@ var FrequencyStore = {
 		result.drawData.forEach(function (item, i) {
 			item.csv = drawDataToCSV(item, state.directoryMetadata.tags[i]);
 		});
-		target.setState({
-			query: query,
-			result: result
-		});
+		setState({ query: query, result: result });
 	},
-	FrequencySubmit: function FrequencySubmit(payload, state, target) {
+	FrequencySubmit: function FrequencySubmit(payload, state, setState) {
 		var query = state.query,
 		    result = state.result;
 		var term = query.typing.trim();
@@ -671,12 +673,9 @@ var FrequencyStore = {
 		result.drawData.forEach(function (item, i) {
 			item.csv = drawDataToCSV(item, tag_set[i]);
 		});
-		target.setState({
-			query: query,
-			result: result
-		});
+		setState({ query: query, result: result });
 	},
-	FiltersApply: function FiltersApply(payload, state, target) {
+	FiltersApply: function FiltersApply(payload, state, setState) {
 		var query = state.query,
 		    result = state.result;
 		if (query.done.size === 0) {
@@ -711,9 +710,7 @@ var FrequencyStore = {
 		result.drawData.forEach(function (item, i) {
 			item.csv = drawDataToCSV(item, state.directoryMetadata.tags[i]);
 		});
-		target.setState({
-			result: result
-		});
+		setState({ result: result });
 	}
 };
 exports.default = FrequencyStore;
@@ -872,9 +869,9 @@ var _States2 = _interopRequireDefault(_States);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var RouterStore = {
-	PageChange: function PageChange(payload, state, target) {
+	PageChange: function PageChange(payload, state, setState, target) {
 		target.myDispatcher.setURL(payload);
-		target.setState(_States2.default.PageState(payload));
+		setState(_States2.default.PageState(payload));
 	}
 };
 exports.default = RouterStore;

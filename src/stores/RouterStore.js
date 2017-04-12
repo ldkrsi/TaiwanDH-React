@@ -1,9 +1,9 @@
 import myState from "../States";
 
 const RouterStore = {
-	PageChange: function(payload, state, target){
+	PageChange: function(payload, state, setState, target){
 		target.myDispatcher.setURL(payload);
-		target.setState(myState.PageState(payload));
+		setState(myState.PageState(payload));
 	}
 };
 export default RouterStore;

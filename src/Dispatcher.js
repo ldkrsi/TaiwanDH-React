@@ -19,26 +19,29 @@ class Dispatcher{
 		this.component = component;
 		this.stores = stores;
 		this.now_url = null;
+		this.setState = (dict) => {
+			this.component.setState(dict);
+		};
 	}
 	setURL(url){
 		this.now_url = url;
 	}
 	dispatch(command){
 		this.stores.global.forEach((store) => {
-			this.run_command(store, command);
+			this.runCommand(store, command);
 		});
 		if(!(this.now_url in this.stores.pages)){
 			return;
 		}
 		this.stores.pages[this.now_url].forEach((store) => {
-			this.run_command(store, command);
+			this.runCommand(store, command);
 		});
 	}
-	run_command(store, command){
+	runCommand(store, command){
 		if(!(command.type in store)){
 			return;
 		}
-		store[command.type](command.payload, this.component.state, this.component);
+		store[command.type](command.payload, this.component.state, this.setState, this.component);
 	}
 }
 
