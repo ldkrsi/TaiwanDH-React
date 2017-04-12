@@ -135,81 +135,19 @@ function selector(url, dict) {
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
+var my_events = ['PageChange', 'InputDirChange', 'AddFilter', 'RemoveFilter', 'FilterExcludeChange', 'FilterEqualChange', 'FilterValueChange', 'FilterKeyChange', 'FiltersApply', 'FrequencyTyping', 'FrequencySubmit', 'FrequencyRemove'];
+
 function getActions(dispatcher) {
-	return {
-		PageChange: function PageChange(url) {
+	var obj = new Object();
+	my_events.forEach(function (item) {
+		obj[item] = function (p) {
 			dispatcher.dispatch({
-				type: 'PageChange',
-				payload: url
-			});
-		},
-		InputDirChange: function InputDirChange(e) {
-			dispatcher.dispatch({
-				type: 'InputDirChange',
-				payload: e
-			});
-		},
-		FrequencyTyping: function FrequencyTyping(query) {
-			dispatcher.dispatch({
-				type: 'FrequencyTyping',
-				payload: query
-			});
-		},
-		FrequencySubmit: function FrequencySubmit(e) {
-			dispatcher.dispatch({
-				type: 'FrequencySubmit',
-				payload: e
-			});
-		},
-		FrequencyRemove: function FrequencyRemove(term) {
-			dispatcher.dispatch({
-				type: 'FrequencyRemove',
-				payload: term
-			});
-		},
-		AddFilter: function AddFilter(e) {
-			dispatcher.dispatch({
-				type: 'AddFilter',
-				payload: e
-			});
-		},
-		RemoveFilter: function RemoveFilter(i) {
-			dispatcher.dispatch({
-				type: 'RemoveFilter',
-				payload: i
-			});
-		},
-		FilterExcludeChange: function FilterExcludeChange(p) {
-			dispatcher.dispatch({
-				type: 'FilterExcludeChange',
+				type: item,
 				payload: p
 			});
-		},
-		FilterEqualChange: function FilterEqualChange(p) {
-			dispatcher.dispatch({
-				type: 'FilterEqualChange',
-				payload: p
-			});
-		},
-		FilterValueChange: function FilterValueChange(p) {
-			dispatcher.dispatch({
-				type: 'FilterValueChange',
-				payload: p
-			});
-		},
-		FilterKeyChange: function FilterKeyChange(p) {
-			dispatcher.dispatch({
-				type: 'FilterKeyChange',
-				payload: p
-			});
-		},
-		FiltersApply: function FiltersApply(p) {
-			dispatcher.dispatch({
-				type: 'FiltersApply',
-				payload: p
-			});
-		}
-	};
+		};
+	});
+	return obj;
 }
 exports.default = getActions;
 
