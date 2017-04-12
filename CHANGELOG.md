@@ -3,10 +3,14 @@
 更新紀錄
 
 ## [Unreleased]
+### Added
+- 語境分析
 
+## [0.3.1] - 2017-04-11
 ### Changed
 - 重構action
 - 改寫路由方法
+- 改寫setState部份，保護root component
 
 ## [0.3.0] - 2017-04-11
 ### Added

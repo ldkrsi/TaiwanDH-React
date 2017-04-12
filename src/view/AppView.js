@@ -1,5 +1,5 @@
 import React from 'react';
-import Menu from './RouterView';
+import Menu from './MenuView';
 
 function AppView(props) {
 	return(<div>

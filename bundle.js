@@ -258,9 +258,9 @@ var _react = __webpack_require__(5);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _RouterView = __webpack_require__(25);
+var _MenuView = __webpack_require__(30);
 
-var _RouterView2 = _interopRequireDefault(_RouterView);
+var _MenuView2 = _interopRequireDefault(_MenuView);
 
 var _StatePage = __webpack_require__(29);
 
@@ -277,7 +277,7 @@ function AppView(props) {
 		'div',
 		null,
 		props.state.database.length === 0 ? _react2.default.createElement(DirectoryInput, { actions: props.actions }) : '',
-		_react2.default.createElement(_RouterView2.default, props),
+		_react2.default.createElement(_MenuView2.default, props),
 		props.state.database.length === 0 ? '' : _react2.default.createElement(MainArea, props)
 	);
 }
@@ -1168,68 +1168,7 @@ exports.default = ExportComponent;
 module.exports = reactChartjs2;
 
 /***/ }),
-/* 25 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _react = __webpack_require__(5);
-
-var _react2 = _interopRequireDefault(_react);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var routeTable = [{ text: "狀態", url: "state" }, { text: "詞頻分析", url: "frequency" }];
-
-function Menu(props) {
-	var onClick = function onClick(e) {
-		props.actions.PageChange(e.target.dataset.url);
-	};
-	if (props.state.database.length === 0) {
-		return _react2.default.createElement(
-			"nav",
-			null,
-			_react2.default.createElement(
-				"ul",
-				{ className: "disable" },
-				routeTable.map(function (item, i) {
-					return _react2.default.createElement(
-						"li",
-						{ key: i },
-						item.text
-					);
-				})
-			)
-		);
-	}
-	return _react2.default.createElement(
-		"nav",
-		null,
-		_react2.default.createElement(
-			"ul",
-			{ className: "enable" },
-			routeTable.map(function (item, i) {
-				return _react2.default.createElement(
-					"li",
-					{ key: i,
-						className: item.url === props.state.url ? 'active' : '',
-						onClick: item.url === props.state.url ? '' : onClick,
-						"data-url": item.url
-					},
-					item.text
-				);
-			})
-		)
-	);
-}
-exports.default = Menu;
-
-/***/ }),
+/* 25 */,
 /* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1769,6 +1708,68 @@ function DirectoryMetadata(props) {
 		)
 	);
 }
+
+/***/ }),
+/* 30 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _react = __webpack_require__(5);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var routeTable = [{ text: "狀態", url: "state" }, { text: "詞頻分析", url: "frequency" }];
+
+function Menu(props) {
+	var onClick = function onClick(e) {
+		props.actions.PageChange(e.target.dataset.url);
+	};
+	if (props.state.database.length === 0) {
+		return _react2.default.createElement(
+			"nav",
+			null,
+			_react2.default.createElement(
+				"ul",
+				{ className: "disable" },
+				routeTable.map(function (item, i) {
+					return _react2.default.createElement(
+						"li",
+						{ key: i },
+						item.text
+					);
+				})
+			)
+		);
+	}
+	return _react2.default.createElement(
+		"nav",
+		null,
+		_react2.default.createElement(
+			"ul",
+			{ className: "enable" },
+			routeTable.map(function (item, i) {
+				return _react2.default.createElement(
+					"li",
+					{ key: i,
+						className: item.url === props.state.url ? 'active' : '',
+						onClick: item.url === props.state.url ? '' : onClick,
+						"data-url": item.url
+					},
+					item.text
+				);
+			})
+		)
+	);
+}
+exports.default = Menu;
 
 /***/ })
 /******/ ]);
