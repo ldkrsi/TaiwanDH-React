@@ -3,6 +3,7 @@ import React from 'react';
 const routeTable = [
 	{text: "狀態", url: "state"},
 	{text: "詞頻分析", url: "frequency"},
+	{text: "語境分析", url: "context"}
 ]; 
 
 function Menu(props){

@@ -12,6 +12,7 @@ export default AppView;
 
 import StatePage from './pages/StatePage';
 import FrequencyPage from './pages/FrequencyPage';
+import ContextPage from './pages/ContextPage';
 
 function MainArea(props){
 	switch(props.state.url){
@@ -19,6 +20,8 @@ function MainArea(props){
 			return (<StatePage {...props} />);
 		case 'frequency':
 			return (<FrequencyPage {...props} />);
+		case 'context':
+			return (<ContextPage {...props} />);
 		default:
 			return (<div>error</div>);
 	}

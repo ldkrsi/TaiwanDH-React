@@ -29,6 +29,12 @@ const queryMap = {
 			done: new Set(),
 			filters: []
 		};
+	},
+	context: function(){
+		return {
+			typing: '',
+			filters: []
+		};	
 	}
 };
 const resultMap = {
@@ -36,6 +42,12 @@ const resultMap = {
 		return {
 			totals: {},
 			drawData: []
+		};
+	},
+	context: function(){
+		return {
+			term: '',
+			table: null
 		};
 	}
 };

@@ -2,6 +2,7 @@ import AppStore from './stores/AppStore';
 import FilterStore from './stores/FilterStore';
 import RouterStore from './stores/RouterStore';
 import FrequencyStore from './stores/FrequencyStore';
+import ContextStore from './stores/ContextStore';
 
 function getDispatcher(target){
 	return new Dispatcher(target, all_stores);
@@ -10,7 +11,8 @@ export default getDispatcher;
 const all_stores = {
 	global: [AppStore, RouterStore, FilterStore],
 	pages: {
-		frequency: [FrequencyStore]
+		frequency: [FrequencyStore],
+		context: [ContextStore]
 	}
 };
 
