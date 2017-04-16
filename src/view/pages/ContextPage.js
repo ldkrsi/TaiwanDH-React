@@ -11,12 +11,18 @@ function ResultArea(props){
 	const result = props.state.result;
 	return(<div>
 		<h2>{result.term}</h2>
-		<table><tbody>{result.table.map(function(row, i){
-			return(<tr key={i}>
-				<td>{row[0]}</td>
-				<td dangerouslySetInnerHTML={{__html: row[1]}}></td>
-			</tr>);
-		})}</tbody></table>
+		<div className="context-table">{result.table.map(function(row, i){
+			return(<div className="row" key={i}>
+				<h3>{row[0]}</h3>
+				<p>	<a>上一個</a> <a>下一個</a>&nbsp;
+					<span>&#8226;</span><span>&#8901;</span><span>&#8901;</span><span>&#8901;</span>
+				</p>
+				<div>
+					<div dangerouslySetInnerHTML={{__html: row[1]}}></div>
+				</div>
+			</div>);
+		})}</div>
+		
 	</div>);
 }
 function InputArea(props){

@@ -1897,24 +1897,61 @@ function ResultArea(props) {
 			result.term
 		),
 		_react2.default.createElement(
-			'table',
-			null,
-			_react2.default.createElement(
-				'tbody',
-				null,
-				result.table.map(function (row, i) {
-					return _react2.default.createElement(
-						'tr',
-						{ key: i },
+			'div',
+			{ className: 'context-table' },
+			result.table.map(function (row, i) {
+				return _react2.default.createElement(
+					'div',
+					{ className: 'row', key: i },
+					_react2.default.createElement(
+						'h3',
+						null,
+						row[0]
+					),
+					_react2.default.createElement(
+						'p',
+						null,
+						' ',
 						_react2.default.createElement(
-							'td',
+							'a',
 							null,
-							row[0]
+							'\u4E0A\u4E00\u500B'
 						),
-						_react2.default.createElement('td', { dangerouslySetInnerHTML: { __html: row[1] } })
-					);
-				})
-			)
+						' ',
+						_react2.default.createElement(
+							'a',
+							null,
+							'\u4E0B\u4E00\u500B'
+						),
+						'\xA0',
+						_react2.default.createElement(
+							'span',
+							null,
+							'\u2022'
+						),
+						_react2.default.createElement(
+							'span',
+							null,
+							'\u22C5'
+						),
+						_react2.default.createElement(
+							'span',
+							null,
+							'\u22C5'
+						),
+						_react2.default.createElement(
+							'span',
+							null,
+							'\u22C5'
+						)
+					),
+					_react2.default.createElement(
+						'div',
+						null,
+						_react2.default.createElement('div', { dangerouslySetInnerHTML: { __html: row[1] } })
+					)
+				);
+			})
 		)
 	);
 }

@@ -60,7 +60,7 @@ span.remove-x
 		min-width: 441px
 		margin-bottom: 8px
 		padding-bottom: 8px
-		border-bottom: 1px solid #e6e6e6;
+		border-bottom: 1px solid #e6e6e6
 		select
 			@include font-x-small-body
 			margin-right: 13px
@@ -77,3 +77,24 @@ span.remove-x
 .button-group
 	button
 		margin-right: 13px
+
+.context-table
+	width: 100%
+	.row
+		border-bottom: 1px solid #e6e6e6
+		padding-bottom: 10px
+		margin-bottom: 10px
+		a
+			@include blue
+			cursor: pointer
+			&:hover, &:active
+				text-decoration: underline
+		& > div
+			overflow-x: auto
+			div
+				white-space: nowrap
+				padding-bottom: 5px
+				span
+					@include red
+					font-weight: 600
+			
