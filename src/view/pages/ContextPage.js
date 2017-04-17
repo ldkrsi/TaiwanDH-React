@@ -3,7 +3,7 @@ import React from 'react';
 function ContextPage(props){
 	return(<div>
 		<InputArea {...props} />
-		{props.state.result.table === null ? '': <ResultArea state={props.state} />}
+		{props.state.result.table === null ? '': <ResultArea {...props} />}
 	</div>);
 }
 export default ContextPage;
@@ -12,17 +12,45 @@ function ResultArea(props){
 	return(<div>
 		<h2>{result.term}</h2>
 		<div className="context-table">{result.table.map(function(row, i){
-			return(<div className="row" key={i}>
-				<h3>{row[0]}</h3>
-				<p>	<a>上一個</a> <a>下一個</a>&nbsp;
-					<span>&#8226;</span><span>&#8901;</span><span>&#8901;</span><span>&#8901;</span>
-				</p>
-				<div>
-					<div dangerouslySetInnerHTML={{__html: row[1]}}></div>
-				</div>
-			</div>);
+			return(<DataRow row={row} index={i} key={i} actions={props.actions} />);
 		})}</div>
 		
+	</div>);
+}
+function DataRow(props){
+	const row = props.row;
+	const to_scrollLeft = (dom) => {
+		if(dom === null){
+			return;
+		}
+		let target = dom.getElementsByTagName('span')[row[2]];
+		let v = target.offsetLeft - dom.offsetLeft - 450;
+		dom.scrollLeft = v;
+	};
+	const nextSpan = () => {
+		props.actions.ShiftToSpan({
+			index: props.index,
+			value: 1
+		});
+	};
+	const prevSpan = () => {
+		props.actions.ShiftToSpan({
+			index: props.index,
+			value: -1
+		});
+	};
+	return(<div className="row">
+		<h3>{row[0]}</h3>
+		<p>
+			<a onClick={prevSpan}>上一個</a>&nbsp;
+			<a onClick={nextSpan}>下一個</a>&nbsp;
+			{Array.apply(null, Array(row[3])).map((_,i) => {
+				return (row[2] === i ? <span>&#8226;</span> : <span>&#8901;</span>);
+			})}
+		</p>
+		<div ref={to_scrollLeft}>
+			<div dangerouslySetInnerHTML={{__html: row[1]}}></div>
+		</div>
 	</div>);
 }
 function InputArea(props){

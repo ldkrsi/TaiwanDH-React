@@ -13,6 +13,12 @@ const ContextStore = {
 		result.term = term;
 		result.table = getContents(term, state.database);
 		setState({result: result});
+	},
+	ShiftToSpan: function(payload, state, setState){
+		let result = state.result;
+		let row = result.table[payload.index];
+		row[2] = (row[2] + payload.value + row[3]) % row[3];
+		setState({result: result});
 	}
 };
 export default ContextStore;
@@ -23,7 +29,7 @@ function getContents(string, database){
 		if(tmp === null){
 			return;
 		}
-		result.push([text.metadata.relativePath, tmp]);
+		result.push([text.metadata.relativePath, tmp.text, 0, tmp.counter]);
 	});
 	return result;
 }

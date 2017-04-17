@@ -33,10 +33,11 @@ function DirectoryInput(props){
 		>選擇文本所在資料夾</label>
 		<input type="file"
 			id="directory-input"
-			ref={(d) => {
-				if(d){
-					d.webkitdirectory = true;
+			ref={(dom) => {
+				if(dom === null){
+					return;
 				}
+				dom.webkitdirectory = true;
 			}}
 			onChange={props.actions.InputDirChange}
 		/>

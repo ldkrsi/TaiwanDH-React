@@ -317,7 +317,7 @@ module.exports = reactChartjs2;
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
-var my_events = ['PageChange', 'InputDirChange', 'AddFilter', 'RemoveFilter', 'FilterExcludeChange', 'FilterEqualChange', 'FilterValueChange', 'FilterKeyChange', 'FiltersApply', 'FrequencyTyping', 'FrequencySubmit', 'FrequencyRemove', 'ContextTyping', 'ContextSubmit'];
+var my_events = ['PageChange', 'InputDirChange', 'AddFilter', 'RemoveFilter', 'FilterExcludeChange', 'FilterEqualChange', 'FilterValueChange', 'FilterKeyChange', 'FiltersApply', 'FrequencyTyping', 'FrequencySubmit', 'FrequencyRemove', 'ContextTyping', 'ContextSubmit', 'ShiftToSpan'];
 
 function getActions(dispatcher) {
 	var obj = new Object();
@@ -504,10 +504,11 @@ function DirectoryInput(props) {
 		),
 		_react2.default.createElement('input', { type: 'file',
 			id: 'directory-input',
-			ref: function ref(d) {
-				if (d) {
-					d.webkitdirectory = true;
+			ref: function ref(dom) {
+				if (dom === null) {
+					return;
 				}
+				dom.webkitdirectory = true;
 			},
 			onChange: props.actions.InputDirChange
 		})
@@ -1119,15 +1120,18 @@ var TextEntity = function () {
 	}, {
 		key: "tagging",
 		value: function tagging(string) {
-			var f = this.text.includes(string);
-			if (!f) {
+			var f = this.occurrences(string);
+			if (f === 0) {
 				return null;
 			}
 			var text = _mixin2.default.escapeHtml(this.text);
 			string = _mixin2.default.escapeHtml(string);
-			return text.replace(new RegExp(string, 'g'), function (x) {
-				return '<span>' + x + '</span>';
-			});
+			return {
+				counter: f,
+				text: text.replace(new RegExp(string, 'g'), function (x) {
+					return '<span>' + x + '</span>';
+				})
+			};
 		}
 	}]);
 
@@ -1843,6 +1847,12 @@ var ContextStore = {
 		result.term = term;
 		result.table = getContents(term, state.database);
 		setState({ result: result });
+	},
+	ShiftToSpan: function ShiftToSpan(payload, state, setState) {
+		var result = state.result;
+		var row = result.table[payload.index];
+		row[2] = (row[2] + payload.value + row[3]) % row[3];
+		setState({ result: result });
 	}
 };
 exports.default = ContextStore;
@@ -1854,7 +1864,7 @@ function getContents(string, database) {
 		if (tmp === null) {
 			return;
 		}
-		result.push([text.metadata.relativePath, tmp]);
+		result.push([text.metadata.relativePath, tmp.text, 0, tmp.counter]);
 	});
 	return result;
 }
@@ -1881,7 +1891,7 @@ function ContextPage(props) {
 		'div',
 		null,
 		_react2.default.createElement(InputArea, props),
-		props.state.result.table === null ? '' : _react2.default.createElement(ResultArea, { state: props.state })
+		props.state.result.table === null ? '' : _react2.default.createElement(ResultArea, props)
 	);
 }
 exports.default = ContextPage;
@@ -1900,58 +1910,72 @@ function ResultArea(props) {
 			'div',
 			{ className: 'context-table' },
 			result.table.map(function (row, i) {
-				return _react2.default.createElement(
-					'div',
-					{ className: 'row', key: i },
-					_react2.default.createElement(
-						'h3',
-						null,
-						row[0]
-					),
-					_react2.default.createElement(
-						'p',
-						null,
-						' ',
-						_react2.default.createElement(
-							'a',
-							null,
-							'\u4E0A\u4E00\u500B'
-						),
-						' ',
-						_react2.default.createElement(
-							'a',
-							null,
-							'\u4E0B\u4E00\u500B'
-						),
-						'\xA0',
-						_react2.default.createElement(
-							'span',
-							null,
-							'\u2022'
-						),
-						_react2.default.createElement(
-							'span',
-							null,
-							'\u22C5'
-						),
-						_react2.default.createElement(
-							'span',
-							null,
-							'\u22C5'
-						),
-						_react2.default.createElement(
-							'span',
-							null,
-							'\u22C5'
-						)
-					),
-					_react2.default.createElement(
-						'div',
-						null,
-						_react2.default.createElement('div', { dangerouslySetInnerHTML: { __html: row[1] } })
-					)
+				return _react2.default.createElement(DataRow, { row: row, index: i, key: i, actions: props.actions });
+			})
+		)
+	);
+}
+function DataRow(props) {
+	var row = props.row;
+	var to_scrollLeft = function to_scrollLeft(dom) {
+		if (dom === null) {
+			return;
+		}
+		var target = dom.getElementsByTagName('span')[row[2]];
+		var v = target.offsetLeft - dom.offsetLeft - 450;
+		dom.scrollLeft = v;
+	};
+	var nextSpan = function nextSpan() {
+		props.actions.ShiftToSpan({
+			index: props.index,
+			value: 1
+		});
+	};
+	var prevSpan = function prevSpan() {
+		props.actions.ShiftToSpan({
+			index: props.index,
+			value: -1
+		});
+	};
+	return _react2.default.createElement(
+		'div',
+		{ className: 'row' },
+		_react2.default.createElement(
+			'h3',
+			null,
+			row[0]
+		),
+		_react2.default.createElement(
+			'p',
+			null,
+			_react2.default.createElement(
+				'a',
+				{ onClick: prevSpan },
+				'\u4E0A\u4E00\u500B'
+			),
+			'\xA0',
+			_react2.default.createElement(
+				'a',
+				{ onClick: nextSpan },
+				'\u4E0B\u4E00\u500B'
+			),
+			'\xA0',
+			Array.apply(null, Array(row[3])).map(function (_, i) {
+				return row[2] === i ? _react2.default.createElement(
+					'span',
+					null,
+					'\u2022'
+				) : _react2.default.createElement(
+					'span',
+					null,
+					'\u22C5'
 				);
 			})
+		),
+		_react2.default.createElement(
+			'div',
+			{ ref: to_scrollLeft },
+			_react2.default.createElement('div', { dangerouslySetInnerHTML: { __html: row[1] } })
 		)
 	);
 }

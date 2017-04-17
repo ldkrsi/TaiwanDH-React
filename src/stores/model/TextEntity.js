@@ -13,13 +13,16 @@ class TextEntity{
 		return (this.text.match(new RegExp(string, "g")) || []).length;
 	}
 	tagging(string){
-		let f = this.text.includes(string);
-		if(!f){
+		let f = this.occurrences(string);
+		if(f === 0){
 			return null;
 		}
 		let text = MixinMethods.escapeHtml(this.text);
 		string = MixinMethods.escapeHtml(string);
-		return text.replace(new RegExp(string, 'g'), function(x){return '<span>'+x+'</span>'});
+		return {
+			counter: f,
+			text: text.replace(new RegExp(string, 'g'), function(x){return '<span>'+x+'</span>'})
+		};
 	}
 }
 export default TextEntity;
