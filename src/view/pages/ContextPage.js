@@ -1,4 +1,5 @@
 import React from 'react';
+import ExportComponent from '../components/export-component';
 
 function ContextPage(props){
 	return(<div>
@@ -11,6 +12,10 @@ function ResultArea(props){
 	const result = props.state.result;
 	return(<div>
 		<h2>{result.term}</h2>
+		<div className="block-element">
+			<p>共{result.table.length}個文本包含<strong>{result.term}</strong>這個詞彙</p>
+			<ExportComponent name={result.term + '語境.html'} text="點此匯出下方資料(html)" blobObject={result.blob} />
+		</div>
 		<div className="context-table">{result.table.map(function(row, i){
 			return(<DataRow row={row} index={i} key={i} actions={props.actions} />);
 		})}</div>
@@ -23,7 +28,7 @@ function DataRow(props){
 		if(dom === null){
 			return;
 		}
-		let target = dom.getElementsByTagName('span')[row[2]];
+		let target = dom.getElementsByTagName('em')[row[2]];
 		let v = target.offsetLeft - dom.offsetLeft - 450;
 		dom.scrollLeft = v;
 	};

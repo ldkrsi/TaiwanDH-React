@@ -12,6 +12,7 @@ const ContextStore = {
 		}
 		result.term = term;
 		result.table = getContents(term, state.database);
+		result.blob = toHtmlBlob(result.table);
 		setState({result: result});
 	},
 	ShiftToSpan: function(payload, state, setState){
@@ -32,4 +33,18 @@ function getContents(string, database){
 		result.push([text.metadata.relativePath, tmp.text, 0, tmp.counter]);
 	});
 	return result;
+}
+function toHtmlBlob(table){
+	let result = '\uFEFF';
+	table.forEach(function(row){
+		result += '<div>';
+		result += '<h2>';
+		result += row[0];
+		result += '</h2>';
+		result += '<p>';
+		result += row[1];
+		result += '</p>';
+		result += '</div>';
+	});
+	return new Blob([result], {type: 'text/html'});
 }

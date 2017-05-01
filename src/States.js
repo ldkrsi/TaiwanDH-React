@@ -47,7 +47,8 @@ const resultMap = {
 	context: function(){
 		return {
 			term: '',
-			table: null
+			table: null,
+			blob: null
 		};
 	}
 };

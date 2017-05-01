@@ -183,7 +183,8 @@ var resultMap = {
 	context: function context() {
 		return {
 			term: '',
-			table: null
+			table: null,
+			blob: null
 		};
 	}
 };
@@ -1129,7 +1130,7 @@ var TextEntity = function () {
 			return {
 				counter: f,
 				text: text.replace(new RegExp(string, 'g'), function (x) {
-					return '<span>' + x + '</span>';
+					return '<em>' + x + '</em>';
 				})
 			};
 		}
@@ -1846,6 +1847,7 @@ var ContextStore = {
 		}
 		result.term = term;
 		result.table = getContents(term, state.database);
+		result.blob = toHtmlBlob(result.table);
 		setState({ result: result });
 	},
 	ShiftToSpan: function ShiftToSpan(payload, state, setState) {
@@ -1868,6 +1870,20 @@ function getContents(string, database) {
 	});
 	return result;
 }
+function toHtmlBlob(table) {
+	var result = '\uFEFF';
+	table.forEach(function (row) {
+		result += '<div>';
+		result += '<h2>';
+		result += row[0];
+		result += '</h2>';
+		result += '<p>';
+		result += row[1];
+		result += '</p>';
+		result += '</div>';
+	});
+	return new Blob([result], { type: 'text/html' });
+}
 
 /***/ }),
 /* 31 */
@@ -1883,6 +1899,10 @@ Object.defineProperty(exports, "__esModule", {
 var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
+
+var _exportComponent = __webpack_require__(4);
+
+var _exportComponent2 = _interopRequireDefault(_exportComponent);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1908,6 +1928,24 @@ function ResultArea(props) {
 		),
 		_react2.default.createElement(
 			'div',
+			{ className: 'block-element' },
+			_react2.default.createElement(
+				'p',
+				null,
+				'\u5171',
+				result.table.length,
+				'\u500B\u6587\u672C\u5305\u542B',
+				_react2.default.createElement(
+					'strong',
+					null,
+					result.term
+				),
+				'\u9019\u500B\u8A5E\u5F59'
+			),
+			_react2.default.createElement(_exportComponent2.default, { name: result.term + '語境.html', text: '\u9EDE\u6B64\u532F\u51FA\u4E0B\u65B9\u8CC7\u6599(html)', blobObject: result.blob })
+		),
+		_react2.default.createElement(
+			'div',
 			{ className: 'context-table' },
 			result.table.map(function (row, i) {
 				return _react2.default.createElement(DataRow, { row: row, index: i, key: i, actions: props.actions });
@@ -1921,7 +1959,7 @@ function DataRow(props) {
 		if (dom === null) {
 			return;
 		}
-		var target = dom.getElementsByTagName('span')[row[2]];
+		var target = dom.getElementsByTagName('em')[row[2]];
 		var v = target.offsetLeft - dom.offsetLeft - 450;
 		dom.scrollLeft = v;
 	};

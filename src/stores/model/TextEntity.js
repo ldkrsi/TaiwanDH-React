@@ -21,7 +21,7 @@ class TextEntity{
 		string = MixinMethods.escapeHtml(string);
 		return {
 			counter: f,
-			text: text.replace(new RegExp(string, 'g'), function(x){return '<span>'+x+'</span>'})
+			text: text.replace(new RegExp(string, 'g'), function(x){return '<em>'+x+'</em>'})
 		};
 	}
 }
