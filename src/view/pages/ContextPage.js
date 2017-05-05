@@ -1,9 +1,17 @@
 import React from 'react';
 import ExportComponent from '../components/export-component';
+import FilterComponent from '../components/filter-component';
 
 function ContextPage(props){
+	let state = props.state;
+	let filter = <FilterComponent 
+		filters={state.query.filters} 
+		tags={state.directoryMetadata.tags}
+		actions={props.actions}
+	/>;
 	return(<div>
 		<InputArea {...props} />
+		{filter}
 		{props.state.result.table === null ? '': <ResultArea {...props} />}
 	</div>);
 }

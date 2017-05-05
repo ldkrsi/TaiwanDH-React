@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 23);
+/******/ 	return __webpack_require__(__webpack_require__.s = 25);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -125,6 +125,39 @@ exports.default = MixinMethods;
 
 /***/ }),
 /* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function ExportComponent(props) {
+	return _react2.default.createElement(
+		'p',
+		null,
+		_react2.default.createElement(
+			'a',
+			{
+				download: props.name,
+				href: URL.createObjectURL(props.blobObject)
+			},
+			props.text
+		)
+	);
+}
+exports.default = ExportComponent;
+
+/***/ }),
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -196,7 +229,7 @@ function selector(url, dict) {
 }
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -270,39 +303,6 @@ var ColorSet = function () {
 exports.default = ColorSet;
 
 /***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _react = __webpack_require__(0);
-
-var _react2 = _interopRequireDefault(_react);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function ExportComponent(props) {
-	return _react2.default.createElement(
-		'p',
-		null,
-		_react2.default.createElement(
-			'a',
-			{
-				download: props.name,
-				href: URL.createObjectURL(props.blobObject)
-			},
-			props.text
-		)
-	);
-}
-exports.default = ExportComponent;
-
-/***/ }),
 /* 5 */
 /***/ (function(module, exports) {
 
@@ -351,19 +351,19 @@ var _AppStore = __webpack_require__(11);
 
 var _AppStore2 = _interopRequireDefault(_AppStore);
 
-var _FilterStore = __webpack_require__(12);
+var _FilterStore = __webpack_require__(13);
 
 var _FilterStore2 = _interopRequireDefault(_FilterStore);
 
-var _RouterStore = __webpack_require__(14);
+var _RouterStore = __webpack_require__(15);
 
 var _RouterStore2 = _interopRequireDefault(_RouterStore);
 
-var _FrequencyStore = __webpack_require__(13);
+var _FrequencyStore = __webpack_require__(14);
 
 var _FrequencyStore2 = _interopRequireDefault(_FrequencyStore);
 
-var _ContextStore = __webpack_require__(30);
+var _ContextStore = __webpack_require__(12);
 
 var _ContextStore2 = _interopRequireDefault(_ContextStore);
 
@@ -446,19 +446,19 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _MenuView = __webpack_require__(18);
+var _MenuView = __webpack_require__(19);
 
 var _MenuView2 = _interopRequireDefault(_MenuView);
 
-var _StatePage = __webpack_require__(22);
+var _StatePage = __webpack_require__(24);
 
 var _StatePage2 = _interopRequireDefault(_StatePage);
 
-var _FrequencyPage = __webpack_require__(21);
+var _FrequencyPage = __webpack_require__(23);
 
 var _FrequencyPage2 = _interopRequireDefault(_FrequencyPage);
 
-var _ContextPage = __webpack_require__(31);
+var _ContextPage = __webpack_require__(22);
 
 var _ContextPage2 = _interopRequireDefault(_ContextPage);
 
@@ -539,11 +539,11 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _TextEntity = __webpack_require__(17);
+var _TextEntity = __webpack_require__(18);
 
 var _TextEntity2 = _interopRequireDefault(_TextEntity);
 
-var _TagDict = __webpack_require__(16);
+var _TagDict = __webpack_require__(17);
 
 var _TagDict2 = _interopRequireDefault(_TagDict);
 
@@ -625,8 +625,81 @@ function read_file(file, setState, target) {
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
+var ContextStore = {
+	ContextTyping: function ContextTyping(payload, state, setState) {
+		var query = state.query;
+		query.typing = payload;
+		setState({ query: query });
+	},
+	ContextSubmit: function ContextSubmit(payload, state, setState) {
+		var query = state.query,
+		    result = state.result;
+		var term = query.typing.trim();
+		if (term.length === 0) {
+			return;
+		}
+		result.term = term;
+		result.table = getContents(term, state.database, query.filters);
+		result.blob = toHtmlBlob(result.table);
+		setState({ result: result });
+	},
+	ShiftToSpan: function ShiftToSpan(payload, state, setState) {
+		var result = state.result;
+		var row = result.table[payload.index];
+		row[2] = (row[2] + payload.value + row[3]) % row[3];
+		setState({ result: result });
+	},
+	FiltersApply: function FiltersApply(payload, state, setState) {
+		ContextStore.ContextSubmit(payload, state, setState);
+	}
+};
+exports.default = ContextStore;
 
-var _Filter = __webpack_require__(15);
+function getContents(string, database, filters) {
+	var result = [];
+	database.forEach(function (text) {
+		var tags = text.metadata.tags;
+		var pass = filters.every(function (f) {
+			return f.passFilter(tags[f.key]);
+		});
+		if (!pass) {
+			return;
+		}
+		var tmp = text.tagging(string);
+		if (tmp === null) {
+			return;
+		}
+		result.push([text.metadata.relativePath, tmp.text, 0, tmp.counter]);
+	});
+	return result;
+}
+function toHtmlBlob(table) {
+	var result = '\uFEFF';
+	table.forEach(function (row) {
+		result += '<div>';
+		result += '<h2>';
+		result += row[0];
+		result += '</h2>';
+		result += '<p>';
+		result += row[1];
+		result += '</p>';
+		result += '</div>';
+	});
+	return new Blob([result], { type: 'text/html' });
+}
+
+/***/ }),
+/* 13 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _Filter = __webpack_require__(16);
 
 var _Filter2 = _interopRequireDefault(_Filter);
 
@@ -662,7 +735,7 @@ var FilterStore = {
 exports.default = FilterStore;
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -676,7 +749,7 @@ var _mixin = __webpack_require__(1);
 
 var _mixin2 = _interopRequireDefault(_mixin);
 
-var _colorSet = __webpack_require__(3);
+var _colorSet = __webpack_require__(4);
 
 var _colorSet2 = _interopRequireDefault(_colorSet);
 
@@ -921,7 +994,7 @@ function pushChartDataRow(source, string, target, args) {
 }
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -931,7 +1004,7 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _States = __webpack_require__(2);
+var _States = __webpack_require__(3);
 
 var _States2 = _interopRequireDefault(_States);
 
@@ -946,7 +1019,7 @@ var RouterStore = {
 exports.default = RouterStore;
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1020,7 +1093,7 @@ var Filter = function () {
 exports.default = Filter;
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1080,7 +1153,7 @@ var TagDict = function () {
 exports.default = TagDict;
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1142,7 +1215,7 @@ var TextEntity = function () {
 exports.default = TextEntity;
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1204,7 +1277,7 @@ function Menu(props) {
 exports.default = Menu;
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1218,7 +1291,7 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _removeComponent = __webpack_require__(20);
+var _removeComponent = __webpack_require__(21);
 
 var _removeComponent2 = _interopRequireDefault(_removeComponent);
 
@@ -1341,7 +1414,7 @@ function FilterItem(props) {
 }
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1374,7 +1447,175 @@ function RemoveComponent(props) {
 exports.default = RemoveComponent;
 
 /***/ }),
-/* 21 */
+/* 22 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _exportComponent = __webpack_require__(2);
+
+var _exportComponent2 = _interopRequireDefault(_exportComponent);
+
+var _filterComponent = __webpack_require__(20);
+
+var _filterComponent2 = _interopRequireDefault(_filterComponent);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function ContextPage(props) {
+	var state = props.state;
+	var filter = _react2.default.createElement(_filterComponent2.default, {
+		filters: state.query.filters,
+		tags: state.directoryMetadata.tags,
+		actions: props.actions
+	});
+	return _react2.default.createElement(
+		'div',
+		null,
+		_react2.default.createElement(InputArea, props),
+		filter,
+		props.state.result.table === null ? '' : _react2.default.createElement(ResultArea, props)
+	);
+}
+exports.default = ContextPage;
+
+function ResultArea(props) {
+	var result = props.state.result;
+	return _react2.default.createElement(
+		'div',
+		null,
+		_react2.default.createElement(
+			'h2',
+			null,
+			result.term
+		),
+		_react2.default.createElement(
+			'div',
+			{ className: 'block-element' },
+			_react2.default.createElement(
+				'p',
+				null,
+				'\u5171',
+				result.table.length,
+				'\u500B\u6587\u672C\u5305\u542B',
+				_react2.default.createElement(
+					'strong',
+					null,
+					result.term
+				),
+				'\u9019\u500B\u8A5E\u5F59'
+			),
+			_react2.default.createElement(_exportComponent2.default, { name: result.term + '語境.html', text: '\u9EDE\u6B64\u532F\u51FA\u4E0B\u65B9\u8CC7\u6599(html)', blobObject: result.blob })
+		),
+		_react2.default.createElement(
+			'div',
+			{ className: 'context-table' },
+			result.table.map(function (row, i) {
+				return _react2.default.createElement(DataRow, { row: row, index: i, key: i, actions: props.actions });
+			})
+		)
+	);
+}
+function DataRow(props) {
+	var row = props.row;
+	var to_scrollLeft = function to_scrollLeft(dom) {
+		if (dom === null) {
+			return;
+		}
+		var target = dom.getElementsByTagName('em')[row[2]];
+		var v = target.offsetLeft - dom.offsetLeft - 450;
+		dom.scrollLeft = v;
+	};
+	var nextSpan = function nextSpan() {
+		props.actions.ShiftToSpan({
+			index: props.index,
+			value: 1
+		});
+	};
+	var prevSpan = function prevSpan() {
+		props.actions.ShiftToSpan({
+			index: props.index,
+			value: -1
+		});
+	};
+	return _react2.default.createElement(
+		'div',
+		{ className: 'row' },
+		_react2.default.createElement(
+			'h3',
+			null,
+			row[0]
+		),
+		_react2.default.createElement(
+			'p',
+			null,
+			_react2.default.createElement(
+				'a',
+				{ onClick: prevSpan },
+				'\u4E0A\u4E00\u500B'
+			),
+			'\xA0',
+			_react2.default.createElement(
+				'a',
+				{ onClick: nextSpan },
+				'\u4E0B\u4E00\u500B'
+			),
+			'\xA0',
+			Array.apply(null, Array(row[3])).map(function (_, i) {
+				return row[2] === i ? _react2.default.createElement(
+					'span',
+					null,
+					'\u2022'
+				) : _react2.default.createElement(
+					'span',
+					null,
+					'\u22C5'
+				);
+			})
+		),
+		_react2.default.createElement(
+			'div',
+			{ ref: to_scrollLeft },
+			_react2.default.createElement('div', { dangerouslySetInnerHTML: { __html: row[1] } })
+		)
+	);
+}
+function InputArea(props) {
+	var onChange = function onChange(e) {
+		props.actions.ContextTyping(e.target.value);
+	};
+	return _react2.default.createElement(
+		'div',
+		null,
+		_react2.default.createElement('input', {
+			type: 'text',
+			placeholder: '\u8F38\u5165\u8A5E\u5F59',
+			value: props.state.query.typing,
+			onChange: onChange
+		}),
+		_react2.default.createElement(
+			'button',
+			{
+				onClick: props.actions.ContextSubmit
+			},
+			'\u78BA\u5B9A'
+		)
+	);
+}
+//http://stackoverflow.com/questions/24665602/scrollintoview-scrolls-just-too-far
+//http://stackoverflow.com/questions/37620694/how-to-scroll-to-bottom-in-react
+
+/***/ }),
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1390,11 +1631,11 @@ var _react2 = _interopRequireDefault(_react);
 
 var _reactChartjs = __webpack_require__(5);
 
-var _exportComponent = __webpack_require__(4);
+var _exportComponent = __webpack_require__(2);
 
 var _exportComponent2 = _interopRequireDefault(_exportComponent);
 
-var _filterComponent = __webpack_require__(19);
+var _filterComponent = __webpack_require__(20);
 
 var _filterComponent2 = _interopRequireDefault(_filterComponent);
 
@@ -1592,7 +1833,7 @@ function InputArea(props) {
 }
 
 /***/ }),
-/* 22 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1608,11 +1849,11 @@ var _react2 = _interopRequireDefault(_react);
 
 var _reactChartjs = __webpack_require__(5);
 
-var _colorSet = __webpack_require__(3);
+var _colorSet = __webpack_require__(4);
 
 var _colorSet2 = _interopRequireDefault(_colorSet);
 
-var _exportComponent = __webpack_require__(4);
+var _exportComponent = __webpack_require__(2);
 
 var _exportComponent2 = _interopRequireDefault(_exportComponent);
 
@@ -1745,7 +1986,7 @@ function DirectoryMetadata(props) {
 }
 
 /***/ }),
-/* 23 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1763,7 +2004,7 @@ var _reactDom = __webpack_require__(10);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
-var _States = __webpack_require__(2);
+var _States = __webpack_require__(3);
 
 var _States2 = _interopRequireDefault(_States);
 
@@ -1815,232 +2056,6 @@ var AppContainer = function (_React$Component) {
 }(_react2.default.Component);
 
 _reactDom2.default.render(_react2.default.createElement(AppContainer, null), document.getElementById('app'));
-
-/***/ }),
-/* 24 */,
-/* 25 */,
-/* 26 */,
-/* 27 */,
-/* 28 */,
-/* 29 */,
-/* 30 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-var ContextStore = {
-	ContextTyping: function ContextTyping(payload, state, setState) {
-		var query = state.query;
-		query.typing = payload;
-		setState({ query: query });
-	},
-	ContextSubmit: function ContextSubmit(payload, state, setState) {
-		var query = state.query,
-		    result = state.result;
-		var term = query.typing.trim();
-		if (term.length === 0) {
-			return;
-		}
-		result.term = term;
-		result.table = getContents(term, state.database);
-		result.blob = toHtmlBlob(result.table);
-		setState({ result: result });
-	},
-	ShiftToSpan: function ShiftToSpan(payload, state, setState) {
-		var result = state.result;
-		var row = result.table[payload.index];
-		row[2] = (row[2] + payload.value + row[3]) % row[3];
-		setState({ result: result });
-	}
-};
-exports.default = ContextStore;
-
-function getContents(string, database) {
-	var result = [];
-	database.forEach(function (text) {
-		var tmp = text.tagging(string);
-		if (tmp === null) {
-			return;
-		}
-		result.push([text.metadata.relativePath, tmp.text, 0, tmp.counter]);
-	});
-	return result;
-}
-function toHtmlBlob(table) {
-	var result = '\uFEFF';
-	table.forEach(function (row) {
-		result += '<div>';
-		result += '<h2>';
-		result += row[0];
-		result += '</h2>';
-		result += '<p>';
-		result += row[1];
-		result += '</p>';
-		result += '</div>';
-	});
-	return new Blob([result], { type: 'text/html' });
-}
-
-/***/ }),
-/* 31 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _react = __webpack_require__(0);
-
-var _react2 = _interopRequireDefault(_react);
-
-var _exportComponent = __webpack_require__(4);
-
-var _exportComponent2 = _interopRequireDefault(_exportComponent);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function ContextPage(props) {
-	return _react2.default.createElement(
-		'div',
-		null,
-		_react2.default.createElement(InputArea, props),
-		props.state.result.table === null ? '' : _react2.default.createElement(ResultArea, props)
-	);
-}
-exports.default = ContextPage;
-
-function ResultArea(props) {
-	var result = props.state.result;
-	return _react2.default.createElement(
-		'div',
-		null,
-		_react2.default.createElement(
-			'h2',
-			null,
-			result.term
-		),
-		_react2.default.createElement(
-			'div',
-			{ className: 'block-element' },
-			_react2.default.createElement(
-				'p',
-				null,
-				'\u5171',
-				result.table.length,
-				'\u500B\u6587\u672C\u5305\u542B',
-				_react2.default.createElement(
-					'strong',
-					null,
-					result.term
-				),
-				'\u9019\u500B\u8A5E\u5F59'
-			),
-			_react2.default.createElement(_exportComponent2.default, { name: result.term + '語境.html', text: '\u9EDE\u6B64\u532F\u51FA\u4E0B\u65B9\u8CC7\u6599(html)', blobObject: result.blob })
-		),
-		_react2.default.createElement(
-			'div',
-			{ className: 'context-table' },
-			result.table.map(function (row, i) {
-				return _react2.default.createElement(DataRow, { row: row, index: i, key: i, actions: props.actions });
-			})
-		)
-	);
-}
-function DataRow(props) {
-	var row = props.row;
-	var to_scrollLeft = function to_scrollLeft(dom) {
-		if (dom === null) {
-			return;
-		}
-		var target = dom.getElementsByTagName('em')[row[2]];
-		var v = target.offsetLeft - dom.offsetLeft - 450;
-		dom.scrollLeft = v;
-	};
-	var nextSpan = function nextSpan() {
-		props.actions.ShiftToSpan({
-			index: props.index,
-			value: 1
-		});
-	};
-	var prevSpan = function prevSpan() {
-		props.actions.ShiftToSpan({
-			index: props.index,
-			value: -1
-		});
-	};
-	return _react2.default.createElement(
-		'div',
-		{ className: 'row' },
-		_react2.default.createElement(
-			'h3',
-			null,
-			row[0]
-		),
-		_react2.default.createElement(
-			'p',
-			null,
-			_react2.default.createElement(
-				'a',
-				{ onClick: prevSpan },
-				'\u4E0A\u4E00\u500B'
-			),
-			'\xA0',
-			_react2.default.createElement(
-				'a',
-				{ onClick: nextSpan },
-				'\u4E0B\u4E00\u500B'
-			),
-			'\xA0',
-			Array.apply(null, Array(row[3])).map(function (_, i) {
-				return row[2] === i ? _react2.default.createElement(
-					'span',
-					null,
-					'\u2022'
-				) : _react2.default.createElement(
-					'span',
-					null,
-					'\u22C5'
-				);
-			})
-		),
-		_react2.default.createElement(
-			'div',
-			{ ref: to_scrollLeft },
-			_react2.default.createElement('div', { dangerouslySetInnerHTML: { __html: row[1] } })
-		)
-	);
-}
-function InputArea(props) {
-	var onChange = function onChange(e) {
-		props.actions.ContextTyping(e.target.value);
-	};
-	return _react2.default.createElement(
-		'div',
-		null,
-		_react2.default.createElement('input', {
-			type: 'text',
-			placeholder: '\u8F38\u5165\u8A5E\u5F59',
-			value: props.state.query.typing,
-			onChange: onChange
-		}),
-		_react2.default.createElement(
-			'button',
-			{
-				onClick: props.actions.ContextSubmit
-			},
-			'\u78BA\u5B9A'
-		)
-	);
-}
-//http://stackoverflow.com/questions/24665602/scrollintoview-scrolls-just-too-far
-//http://stackoverflow.com/questions/37620694/how-to-scroll-to-bottom-in-react
 
 /***/ })
 /******/ ]);

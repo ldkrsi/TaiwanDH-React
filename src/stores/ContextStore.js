@@ -11,7 +11,7 @@ const ContextStore = {
 			return;
 		}
 		result.term = term;
-		result.table = getContents(term, state.database);
+		result.table = getContents(term, state.database, query.filters);
 		result.blob = toHtmlBlob(result.table);
 		setState({result: result});
 	},
@@ -20,12 +20,22 @@ const ContextStore = {
 		let row = result.table[payload.index];
 		row[2] = (row[2] + payload.value + row[3]) % row[3];
 		setState({result: result});
+	},
+	FiltersApply: function(payload, state, setState){
+		ContextStore.ContextSubmit(payload, state, setState);
 	}
 };
 export default ContextStore;
-function getContents(string, database){
+function getContents(string, database, filters){
 	let result = [];
 	database.forEach(function(text){
+		let tags = text.metadata.tags;
+		let pass = filters.every(function(f){
+			return f.passFilter(tags[f.key]);
+		});
+		if(!pass){
+			return;
+		}
 		let tmp = text.tagging(string);
 		if(tmp === null){
 			return;
