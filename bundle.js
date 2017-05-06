@@ -558,6 +558,22 @@ function AppView(props) {
 					'\u8D99\u9707\u96C4'
 				),
 				'\u6216\u662F\u4F60\u6240\u8A8D\u8B58\u97D3\u570B\u6F14\u54E1\u67E5\u770B\u4ED6\u5011\u7684\u6F14\u51FA\u72C0\u6CC1\u3002'
+			),
+			_react2.default.createElement(
+				'h3',
+				null,
+				'\u5354\u52A9\u958B\u767C\u6B64\u5DE5\u5177'
+			),
+			_react2.default.createElement(
+				'p',
+				null,
+				'\u672C\u7A0B\u5F0F',
+				_react2.default.createElement(
+					'a',
+					{ href: 'https://github.com/ldkrsi/TaiwanDH-React' },
+					'\u5728GitHub\u4E0A\u958B\u6E90'
+				),
+				'\uFF0C\u6B61\u8FCE\u5C0D\u6587\u5B57\u5206\u6790\u5DE5\u5177\u6709\u8208\u8DA3\u7684\u4EBA\u7D66\u6211\u5011Pull Request\u6216Fork\u51FA\u5EF6\u4F38\u7248\u672C\u3002'
 			)
 		) : '',
 		props.state.database.length === 0 ? '' : _react2.default.createElement(MainArea, props)
