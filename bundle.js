@@ -470,6 +470,96 @@ function AppView(props) {
 		null,
 		props.state.database.length === 0 ? _react2.default.createElement(DirectoryInput, { actions: props.actions }) : '',
 		_react2.default.createElement(_MenuView2.default, props),
+		props.state.database.length === 0 ? _react2.default.createElement(
+			'div',
+			{ className: 'article' },
+			_react2.default.createElement(
+				'h2',
+				null,
+				'\u8AAA\u660E'
+			),
+			_react2.default.createElement(
+				'p',
+				null,
+				'\u6539\u5BEB\u81EA\u653F\u5927\u8CC7\u79D1\u5289\u662D\u9E9F\u6559\u6388\u6240\u8A2D\u8A08\u7684',
+				_react2.default.createElement(
+					'a',
+					{ href: 'https://sites.google.com/site/taiwandigitalhumanities/ruan-ti-gong-ju' },
+					'\u81FA\u7063\u6578\u4F4D\u4EBA\u6587\u5C0F\u5C0F\u8B9A\u57FA\u672C\u6587\u672C\u5206\u6790\u3001\u7D71\u8A08\u8207\u8A9E\u5883\u64F7\u53D6\u5DE5\u5177'
+				),
+				'\u3002'
+			),
+			_react2.default.createElement(
+				'h3',
+				null,
+				'\u7279\u6027'
+			),
+			_react2.default.createElement(
+				'ul',
+				null,
+				_react2.default.createElement(
+					'li',
+					null,
+					'\u8DE8\u5E73\u53F0\u3001\u514D\u5B89\u88DD'
+				),
+				_react2.default.createElement(
+					'li',
+					null,
+					'\u53EF\u96E2\u7DDA\u64CD\u4F5C\uFF0C\u4E0D\u5C0D\u8CC7\u6599\u9032\u884C\u4E0A\u50B3'
+				)
+			),
+			_react2.default.createElement(
+				'h3',
+				null,
+				'\u793A\u7BC4\u8CC7\u6599'
+			),
+			_react2.default.createElement(
+				'p',
+				null,
+				'\u672C\u5DE5\u5177\u63D0\u4F9B',
+				_react2.default.createElement(
+					'a',
+					{ href: 'demo1.zip' },
+					'\u4E09\u570B\u6F14\u7FA9'
+				),
+				'\u548C',
+				_react2.default.createElement(
+					'a',
+					{ href: 'demo2.zip' },
+					'\u97D3\u570B\u96FB\u5F71\u4E3B\u8981\u6F14\u54E1\u8CC7\u6599'
+				),
+				'\u5169\u500B\u8CC7\u6599\u96C6\u7576\u4F5C\u793A\u7BC4\u8CC7\u6599\uFF0C\u4E0B\u8F09\u5F8C\u4E26\u89E3\u58D3\u7E2E\uFF0C\u518D',
+				_react2.default.createElement(
+					'em',
+					null,
+					'\u9EDE\u9078\u672C\u9801\u4E0A\u65B9\u7684\u9078\u64C7\u8CC7\u6599\u96C6\u6240\u5728\u7684\u8CC7\u6599\u593E'
+				),
+				'\u5F8C\u958B\u59CB\u64CD\u4F5C\u3002'
+			),
+			_react2.default.createElement(
+				'p',
+				null,
+				'\u524D\u8005\u63A1\u56DE\u6578\u5206\u985E\uFF0C\u5C55\u793A\u672C\u7A0B\u5F0F\u5C0D\u6587\u672C\u57FA\u672C\u6AA2\u7D22\uFF0C\u8A66\u8457\u8F38\u5165\u60A8\u6240\u77E5\u7684\u4E09\u570B\u4EBA\u7269\u67E5\u770B\u4ED6\u5011\u5728\u5404\u56DE\u7684\u51FA\u5834\u72C0\u6CC1\u548C\u51FA\u5834\u8A9E\u5883\uFF1B\u5F8C\u8005\u63A1\u4E0A\u6620\u5E74\u6708\u4EFD\u4F86\u5206\u985E\uFF0C\u5C55\u793A\u672C\u7A0B\u5F0F\u8655\u7406\u968E\u5C64\u8A66\u8CC7\u6599\u593E\u7D50\u69CB\u7684\u80FD\u529B\uFF0C\u8F38\u5165',
+				_react2.default.createElement(
+					'strong',
+					null,
+					'\u5433\u9054\u5EB6'
+				),
+				'\u3001',
+				_react2.default.createElement(
+					'strong',
+					null,
+					'\u99AC\u6771\u932B'
+				),
+				'\u3001',
+				_react2.default.createElement(
+					'strong',
+					null,
+					'\u8D99\u9707\u96C4'
+				),
+				'\u6216\u662F\u4F60\u6240\u8A8D\u8B58\u97D3\u570B\u6F14\u54E1\u67E5\u770B\u4ED6\u5011\u7684\u6F14\u51FA\u72C0\u6CC1\u3002'
+			)
+		) : '',
 		props.state.database.length === 0 ? '' : _react2.default.createElement(MainArea, props)
 	);
 }
@@ -501,7 +591,7 @@ function DirectoryInput(props) {
 			{
 				htmlFor: 'directory-input'
 			},
-			'\u9078\u64C7\u6587\u672C\u6240\u5728\u8CC7\u6599\u593E'
+			'\u9078\u64C7\u8CC7\u6599\u96C6\u6240\u5728\u7684\u8CC7\u6599\u593E'
 		),
 		_react2.default.createElement('input', { type: 'file',
 			id: 'directory-input',
