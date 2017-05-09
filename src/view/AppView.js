@@ -27,6 +27,7 @@ export default AppView;
 import StatePage from './pages/StatePage';
 import FrequencyPage from './pages/FrequencyPage';
 import ContextPage from './pages/ContextPage';
+import CooccurrencePage from './pages/CooccurrencePage';
 
 function MainArea(props){
 	switch(props.state.url){
@@ -36,6 +37,8 @@ function MainArea(props){
 			return (<FrequencyPage {...props} />);
 		case 'context':
 			return (<ContextPage {...props} />);
+		case 'cooccurrence':
+			return (<CooccurrencePage {...props} />);
 		default:
 			return (<div>error</div>);
 	}

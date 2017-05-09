@@ -24,5 +24,16 @@ class TextEntity{
 			text: text.replace(new RegExp(string, 'g'), function(x){return '<em>'+x+'</em>'})
 		};
 	}
+	occurrences(term1, term2, window_size){
+		//this.text.indexOf(substring, start)
+		let start_index = 0;
+		while(true){
+			let one = this.text.indexOf(term1, start_index);
+			let two = this.text.indexOf(term2, start_index);
+			if(one === -1 || two === -1){
+				break;
+			}
+		}
+	}
 }
 export default TextEntity;

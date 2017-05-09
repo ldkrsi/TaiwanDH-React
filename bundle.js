@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 25);
+/******/ 	return __webpack_require__(__webpack_require__.s = 26);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -204,6 +204,13 @@ var queryMap = {
 			typing: '',
 			filters: []
 		};
+	},
+	cooccurrence: function cooccurrence() {
+		return {
+			term1: '',
+			term2: '',
+			filters: []
+		};
 	}
 };
 var resultMap = {
@@ -304,12 +311,6 @@ exports.default = ColorSet;
 
 /***/ }),
 /* 5 */
-/***/ (function(module, exports) {
-
-module.exports = reactChartjs2;
-
-/***/ }),
-/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -318,7 +319,150 @@ module.exports = reactChartjs2;
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
-var my_events = ['PageChange', 'InputDirChange', 'AddFilter', 'RemoveFilter', 'FilterExcludeChange', 'FilterEqualChange', 'FilterValueChange', 'FilterKeyChange', 'FiltersApply', 'FrequencyTyping', 'FrequencySubmit', 'FrequencyRemove', 'ContextTyping', 'ContextSubmit', 'ShiftToSpan'];
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _removeComponent = __webpack_require__(22);
+
+var _removeComponent2 = _interopRequireDefault(_removeComponent);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function FilterComponent(props) {
+	var filters = props.filters;
+	var applyBtn = _react2.default.createElement(
+		'button',
+		{ onClick: props.actions.FiltersApply },
+		'Apply'
+	);
+	return _react2.default.createElement(
+		'div',
+		{ className: 'filter-component' },
+		_react2.default.createElement(
+			'h3',
+			null,
+			'\u7BE9\u9078\u5668'
+		),
+		filters.map(function (item, i) {
+			return _react2.default.createElement(FilterItem, {
+				key: i,
+				myIndex: i,
+				filter: item,
+				tags: props.tags,
+				actions: props.actions
+			});
+		}),
+		_react2.default.createElement(
+			'div',
+			{ className: 'button-group' },
+			_react2.default.createElement(
+				'button',
+				{ className: 'small',
+					onClick: props.actions.AddFilter
+				},
+				'+'
+			),
+			applyBtn
+		)
+	);
+}
+exports.default = FilterComponent;
+
+
+function FilterItem(props) {
+	var filter = props.filter;
+	var tags = props.tags;
+	var onRemoveClick = function onRemoveClick(index) {
+		props.actions.RemoveFilter(parseInt(index));
+	};
+	var onExcludeChange = function onExcludeChange(e) {
+		props.actions.FilterExcludeChange({ index: props.myIndex, value: e.target.value });
+	};
+	var onEqualChange = function onEqualChange(e) {
+		props.actions.FilterEqualChange({ index: props.myIndex, value: e.target.value });
+	};
+	var onValueChange = function onValueChange(e) {
+		props.actions.FilterValueChange({ index: props.myIndex, value: e.target.value });
+	};
+	var onKeyChange = function onKeyChange(e) {
+		props.actions.FilterKeyChange({ index: props.myIndex, value: parseInt(e.target.value) });
+	};
+	return _react2.default.createElement(
+		'div',
+		{ className: 'filter-li' },
+		_react2.default.createElement(
+			'select',
+			{ value: filter.is_exclude(), onChange: onExcludeChange },
+			_react2.default.createElement(
+				'option',
+				{ value: '1' },
+				'\u6392\u9664'
+			),
+			_react2.default.createElement(
+				'option',
+				{ value: '0' },
+				'\u5305\u542B'
+			)
+		),
+		_react2.default.createElement(
+			'select',
+			{ value: filter.key.toString(), onChange: onKeyChange },
+			tags.map(function (row, i) {
+				return _react2.default.createElement(
+					'option',
+					{ key: i, value: i.toString() },
+					'第' + (i + 1).toString() + '層'
+				);
+			})
+		),
+		_react2.default.createElement(
+			'select',
+			{ value: filter.is_equal(), onChange: onEqualChange },
+			_react2.default.createElement(
+				'option',
+				{ value: '1' },
+				'\u7B49\u65BC'
+			),
+			_react2.default.createElement(
+				'option',
+				{ value: '0' },
+				'\u4E0D\u7B49\u65BC'
+			)
+		),
+		_react2.default.createElement(
+			'select',
+			{ value: filter.value, onChange: onValueChange },
+			tags[filter.key].keys().map(function (k, i) {
+				return _react2.default.createElement(
+					'option',
+					{ key: i, value: k },
+					k
+				);
+			})
+		),
+		_react2.default.createElement(_removeComponent2.default, { myValue: props.myIndex, action: onRemoveClick })
+	);
+}
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports) {
+
+module.exports = reactChartjs2;
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+var my_events = ['PageChange', 'InputDirChange', 'AddFilter', 'RemoveFilter', 'FilterExcludeChange', 'FilterEqualChange', 'FilterValueChange', 'FilterKeyChange', 'FiltersApply', 'FrequencyTyping', 'FrequencySubmit', 'FrequencyRemove', 'ContextTyping', 'ContextSubmit', 'ShiftToSpan', 'CooccurrenceTyping'];
 
 function getActions(dispatcher) {
 	var obj = new Object();
@@ -335,7 +479,7 @@ function getActions(dispatcher) {
 exports.default = getActions;
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -347,25 +491,29 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _AppStore = __webpack_require__(11);
+var _AppStore = __webpack_require__(12);
 
 var _AppStore2 = _interopRequireDefault(_AppStore);
 
-var _FilterStore = __webpack_require__(13);
+var _FilterStore = __webpack_require__(15);
 
 var _FilterStore2 = _interopRequireDefault(_FilterStore);
 
-var _RouterStore = __webpack_require__(15);
+var _RouterStore = __webpack_require__(17);
 
 var _RouterStore2 = _interopRequireDefault(_RouterStore);
 
-var _FrequencyStore = __webpack_require__(14);
+var _FrequencyStore = __webpack_require__(16);
 
 var _FrequencyStore2 = _interopRequireDefault(_FrequencyStore);
 
-var _ContextStore = __webpack_require__(12);
+var _ContextStore = __webpack_require__(13);
 
 var _ContextStore2 = _interopRequireDefault(_ContextStore);
+
+var _CooccurrenceStore = __webpack_require__(14);
+
+var _CooccurrenceStore2 = _interopRequireDefault(_CooccurrenceStore);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -380,7 +528,8 @@ var all_stores = {
 	global: [_AppStore2.default, _RouterStore2.default, _FilterStore2.default],
 	pages: {
 		frequency: [_FrequencyStore2.default],
-		context: [_ContextStore2.default]
+		context: [_ContextStore2.default],
+		cooccurrence: [_CooccurrenceStore2.default]
 	}
 };
 
@@ -432,7 +581,7 @@ var Dispatcher = function () {
 }();
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -446,21 +595,25 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _MenuView = __webpack_require__(19);
+var _MenuView = __webpack_require__(21);
 
 var _MenuView2 = _interopRequireDefault(_MenuView);
 
-var _StatePage = __webpack_require__(24);
+var _StatePage = __webpack_require__(25);
 
 var _StatePage2 = _interopRequireDefault(_StatePage);
 
-var _FrequencyPage = __webpack_require__(23);
+var _FrequencyPage = __webpack_require__(24);
 
 var _FrequencyPage2 = _interopRequireDefault(_FrequencyPage);
 
-var _ContextPage = __webpack_require__(22);
+var _ContextPage = __webpack_require__(23);
 
 var _ContextPage2 = _interopRequireDefault(_ContextPage);
+
+var _CooccurrencePage = __webpack_require__(33);
+
+var _CooccurrencePage2 = _interopRequireDefault(_CooccurrencePage);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -590,6 +743,8 @@ function MainArea(props) {
 			return _react2.default.createElement(_FrequencyPage2.default, props);
 		case 'context':
 			return _react2.default.createElement(_ContextPage2.default, props);
+		case 'cooccurrence':
+			return _react2.default.createElement(_CooccurrencePage2.default, props);
 		default:
 			return _react2.default.createElement(
 				'div',
@@ -623,19 +778,19 @@ function DirectoryInput(props) {
 }
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports) {
 
 module.exports = ReactDOM;
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -645,11 +800,11 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _TextEntity = __webpack_require__(18);
+var _TextEntity = __webpack_require__(20);
 
 var _TextEntity2 = _interopRequireDefault(_TextEntity);
 
-var _TagDict = __webpack_require__(17);
+var _TagDict = __webpack_require__(19);
 
 var _TagDict2 = _interopRequireDefault(_TagDict);
 
@@ -722,7 +877,7 @@ function read_file(file, setState, target) {
 }
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -795,7 +950,30 @@ function toHtmlBlob(table) {
 }
 
 /***/ }),
-/* 13 */
+/* 14 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+var CooccurrenceStore = {
+	CooccurrenceTyping: function CooccurrenceTyping(payload, state, setState) {
+		var query = state.query;
+		if (payload.index === '1') {
+			query.term1 = payload.value;
+		} else {
+			query.term2 = payload.value;
+		}
+		setState({ query: query });
+	}
+};
+exports.default = CooccurrenceStore;
+
+/***/ }),
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -805,7 +983,7 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _Filter = __webpack_require__(16);
+var _Filter = __webpack_require__(18);
 
 var _Filter2 = _interopRequireDefault(_Filter);
 
@@ -841,7 +1019,7 @@ var FilterStore = {
 exports.default = FilterStore;
 
 /***/ }),
-/* 14 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1100,7 +1278,7 @@ function pushChartDataRow(source, string, target, args) {
 }
 
 /***/ }),
-/* 15 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1125,7 +1303,7 @@ var RouterStore = {
 exports.default = RouterStore;
 
 /***/ }),
-/* 16 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1199,7 +1377,7 @@ var Filter = function () {
 exports.default = Filter;
 
 /***/ }),
-/* 17 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1259,7 +1437,7 @@ var TagDict = function () {
 exports.default = TagDict;
 
 /***/ }),
-/* 18 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1313,6 +1491,19 @@ var TextEntity = function () {
 				})
 			};
 		}
+	}, {
+		key: "occurrences",
+		value: function occurrences(term1, term2, window_size) {
+			//this.text.indexOf(substring, start)
+			var start_index = 0;
+			while (true) {
+				var one = this.text.indexOf(term1, start_index);
+				var two = this.text.indexOf(term2, start_index);
+				if (one === -1 || two === -1) {
+					break;
+				}
+			}
+		}
 	}]);
 
 	return TextEntity;
@@ -1321,7 +1512,7 @@ var TextEntity = function () {
 exports.default = TextEntity;
 
 /***/ }),
-/* 19 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1337,7 +1528,7 @@ var _react2 = _interopRequireDefault(_react);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var routeTable = [{ text: "狀態", url: "state" }, { text: "詞頻分析", url: "frequency" }, { text: "語境分析", url: "context" }];
+var routeTable = [{ text: "狀態", url: "state" }, { text: "詞頻分析", url: "frequency" }, { text: "語境分析", url: "context" }, { text: "共現分析", url: "cooccurrence" }];
 
 function Menu(props) {
 	var onClick = function onClick(e) {
@@ -1383,144 +1574,7 @@ function Menu(props) {
 exports.default = Menu;
 
 /***/ }),
-/* 20 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _react = __webpack_require__(0);
-
-var _react2 = _interopRequireDefault(_react);
-
-var _removeComponent = __webpack_require__(21);
-
-var _removeComponent2 = _interopRequireDefault(_removeComponent);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function FilterComponent(props) {
-	var filters = props.filters;
-	var applyBtn = _react2.default.createElement(
-		'button',
-		{ onClick: props.actions.FiltersApply },
-		'Apply'
-	);
-	return _react2.default.createElement(
-		'div',
-		{ className: 'filter-component' },
-		_react2.default.createElement(
-			'h3',
-			null,
-			'\u7BE9\u9078\u5668'
-		),
-		filters.map(function (item, i) {
-			return _react2.default.createElement(FilterItem, {
-				key: i,
-				myIndex: i,
-				filter: item,
-				tags: props.tags,
-				actions: props.actions
-			});
-		}),
-		_react2.default.createElement(
-			'div',
-			{ className: 'button-group' },
-			_react2.default.createElement(
-				'button',
-				{ className: 'small',
-					onClick: props.actions.AddFilter
-				},
-				'+'
-			),
-			applyBtn
-		)
-	);
-}
-exports.default = FilterComponent;
-
-
-function FilterItem(props) {
-	var filter = props.filter;
-	var tags = props.tags;
-	var onRemoveClick = function onRemoveClick(index) {
-		props.actions.RemoveFilter(parseInt(index));
-	};
-	var onExcludeChange = function onExcludeChange(e) {
-		props.actions.FilterExcludeChange({ index: props.myIndex, value: e.target.value });
-	};
-	var onEqualChange = function onEqualChange(e) {
-		props.actions.FilterEqualChange({ index: props.myIndex, value: e.target.value });
-	};
-	var onValueChange = function onValueChange(e) {
-		props.actions.FilterValueChange({ index: props.myIndex, value: e.target.value });
-	};
-	var onKeyChange = function onKeyChange(e) {
-		props.actions.FilterKeyChange({ index: props.myIndex, value: parseInt(e.target.value) });
-	};
-	return _react2.default.createElement(
-		'div',
-		{ className: 'filter-li' },
-		_react2.default.createElement(
-			'select',
-			{ value: filter.is_exclude(), onChange: onExcludeChange },
-			_react2.default.createElement(
-				'option',
-				{ value: '1' },
-				'\u6392\u9664'
-			),
-			_react2.default.createElement(
-				'option',
-				{ value: '0' },
-				'\u5305\u542B'
-			)
-		),
-		_react2.default.createElement(
-			'select',
-			{ value: filter.key.toString(), onChange: onKeyChange },
-			tags.map(function (row, i) {
-				return _react2.default.createElement(
-					'option',
-					{ key: i, value: i.toString() },
-					'第' + (i + 1).toString() + '層'
-				);
-			})
-		),
-		_react2.default.createElement(
-			'select',
-			{ value: filter.is_equal(), onChange: onEqualChange },
-			_react2.default.createElement(
-				'option',
-				{ value: '1' },
-				'\u7B49\u65BC'
-			),
-			_react2.default.createElement(
-				'option',
-				{ value: '0' },
-				'\u4E0D\u7B49\u65BC'
-			)
-		),
-		_react2.default.createElement(
-			'select',
-			{ value: filter.value, onChange: onValueChange },
-			tags[filter.key].keys().map(function (k, i) {
-				return _react2.default.createElement(
-					'option',
-					{ key: i, value: k },
-					k
-				);
-			})
-		),
-		_react2.default.createElement(_removeComponent2.default, { myValue: props.myIndex, action: onRemoveClick })
-	);
-}
-
-/***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1553,7 +1607,7 @@ function RemoveComponent(props) {
 exports.default = RemoveComponent;
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1571,7 +1625,7 @@ var _exportComponent = __webpack_require__(2);
 
 var _exportComponent2 = _interopRequireDefault(_exportComponent);
 
-var _filterComponent = __webpack_require__(20);
+var _filterComponent = __webpack_require__(5);
 
 var _filterComponent2 = _interopRequireDefault(_filterComponent);
 
@@ -1721,7 +1775,7 @@ function InputArea(props) {
 //http://stackoverflow.com/questions/37620694/how-to-scroll-to-bottom-in-react
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1735,13 +1789,13 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactChartjs = __webpack_require__(5);
+var _reactChartjs = __webpack_require__(6);
 
 var _exportComponent = __webpack_require__(2);
 
 var _exportComponent2 = _interopRequireDefault(_exportComponent);
 
-var _filterComponent = __webpack_require__(20);
+var _filterComponent = __webpack_require__(5);
 
 var _filterComponent2 = _interopRequireDefault(_filterComponent);
 
@@ -1939,7 +1993,7 @@ function InputArea(props) {
 }
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1953,7 +2007,7 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactChartjs = __webpack_require__(5);
+var _reactChartjs = __webpack_require__(6);
 
 var _colorSet = __webpack_require__(4);
 
@@ -2092,7 +2146,7 @@ function DirectoryMetadata(props) {
 }
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2100,13 +2154,13 @@ function DirectoryMetadata(props) {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-__webpack_require__(9);
+__webpack_require__(10);
 
 var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactDom = __webpack_require__(10);
+var _reactDom = __webpack_require__(11);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
@@ -2114,15 +2168,15 @@ var _States = __webpack_require__(3);
 
 var _States2 = _interopRequireDefault(_States);
 
-var _AppView = __webpack_require__(8);
+var _AppView = __webpack_require__(9);
 
 var _AppView2 = _interopRequireDefault(_AppView);
 
-var _Dispatcher = __webpack_require__(7);
+var _Dispatcher = __webpack_require__(8);
 
 var _Dispatcher2 = _interopRequireDefault(_Dispatcher);
 
-var _Action = __webpack_require__(6);
+var _Action = __webpack_require__(7);
 
 var _Action2 = _interopRequireDefault(_Action);
 
@@ -2162,6 +2216,83 @@ var AppContainer = function (_React$Component) {
 }(_react2.default.Component);
 
 _reactDom2.default.render(_react2.default.createElement(AppContainer, null), document.getElementById('app'));
+
+/***/ }),
+/* 27 */,
+/* 28 */,
+/* 29 */,
+/* 30 */,
+/* 31 */,
+/* 32 */,
+/* 33 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _exportComponent = __webpack_require__(2);
+
+var _exportComponent2 = _interopRequireDefault(_exportComponent);
+
+var _filterComponent = __webpack_require__(5);
+
+var _filterComponent2 = _interopRequireDefault(_filterComponent);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function CooccurrencePage(props) {
+	return _react2.default.createElement(
+		'div',
+		null,
+		_react2.default.createElement(InputArea, props)
+	);
+}
+exports.default = CooccurrencePage;
+
+
+function InputArea(props) {
+	var onChange1 = function onChange1(e) {
+		props.actions.CooccurrenceTyping({
+			index: '1',
+			value: e.target.value
+		});
+	};
+	var onChange2 = function onChange2(e) {
+		props.actions.CooccurrenceTyping({
+			index: '2',
+			value: e.target.value
+		});
+	};
+	return _react2.default.createElement(
+		'div',
+		null,
+		_react2.default.createElement('input', {
+			type: 'text',
+			placeholder: '\u8F38\u5165\u8A5E\u5F59\u4E00',
+			onChange: onChange1,
+			value: props.state.query.term1
+		}),
+		_react2.default.createElement('input', {
+			type: 'text',
+			placeholder: '\u8F38\u5165\u8A5E\u5F59\u4E8C',
+			onChange: onChange2,
+			value: props.state.query.term2
+		}),
+		_react2.default.createElement(
+			'button',
+			null,
+			'\u78BA\u5B9A'
+		)
+	);
+}
 
 /***/ })
 /******/ ]);

@@ -35,6 +35,13 @@ const queryMap = {
 			typing: '',
 			filters: []
 		};	
+	},
+	cooccurrence: function(){
+		return {
+			term1: '',
+			term2: '',
+			filters: []
+		}
 	}
 };
 const resultMap = {

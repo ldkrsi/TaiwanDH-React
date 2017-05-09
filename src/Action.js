@@ -2,7 +2,8 @@ const my_events = [
 	'PageChange', 'InputDirChange',
 	'AddFilter', 'RemoveFilter', 'FilterExcludeChange', 'FilterEqualChange', 'FilterValueChange', 'FilterKeyChange', 'FiltersApply',
 	'FrequencyTyping', 'FrequencySubmit', 'FrequencyRemove',
-	'ContextTyping', 'ContextSubmit', 'ShiftToSpan'
+	'ContextTyping', 'ContextSubmit', 'ShiftToSpan',
+	'CooccurrenceTyping',
 ];
 
 function getActions(dispatcher){

@@ -3,6 +3,7 @@ import FilterStore from './stores/FilterStore';
 import RouterStore from './stores/RouterStore';
 import FrequencyStore from './stores/FrequencyStore';
 import ContextStore from './stores/ContextStore';
+import CooccurrenceStore from './stores/CooccurrenceStore';
 
 function getDispatcher(target){
 	return new Dispatcher(target, all_stores);
@@ -12,7 +13,8 @@ const all_stores = {
 	global: [AppStore, RouterStore, FilterStore],
 	pages: {
 		frequency: [FrequencyStore],
-		context: [ContextStore]
+		context: [ContextStore],
+		cooccurrence: [CooccurrenceStore]
 	}
 };
 
