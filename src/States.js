@@ -57,6 +57,11 @@ const resultMap = {
 			table: null,
 			blob: null
 		};
+	},
+	cooccurrence: function(){
+		return {
+			rows: []
+		}
 	}
 };
 function selector(url, dict){

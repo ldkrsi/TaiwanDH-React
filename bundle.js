@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 26);
+/******/ 	return __webpack_require__(__webpack_require__.s = 27);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -158,159 +158,6 @@ exports.default = ExportComponent;
 
 /***/ }),
 /* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-var myState = {
-	InitState: function InitState() {
-		return {
-			url: 'state',
-			database: [],
-			directoryMetadata: {
-				name: null,
-				textCount: 0,
-				deep: 0,
-				tags: null
-			},
-			query: null,
-			result: null
-		};
-	},
-	PageState: function PageState(url) {
-		return {
-			url: url,
-			query: selector(url, queryMap),
-			result: selector(url, resultMap)
-		};
-	}
-};
-exports.default = myState;
-
-var queryMap = {
-	frequency: function frequency() {
-		return {
-			typing: '',
-			done: new Set(),
-			filters: []
-		};
-	},
-	context: function context() {
-		return {
-			typing: '',
-			filters: []
-		};
-	},
-	cooccurrence: function cooccurrence() {
-		return {
-			term1: '',
-			term2: '',
-			filters: []
-		};
-	}
-};
-var resultMap = {
-	frequency: function frequency() {
-		return {
-			totals: {},
-			drawData: []
-		};
-	},
-	context: function context() {
-		return {
-			term: '',
-			table: null,
-			blob: null
-		};
-	}
-};
-function selector(url, dict) {
-	if (!(url in dict)) {
-		return null;
-	}
-	return dict[url]();
-}
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var ColorSet = function () {
-	function ColorSet() {
-		var alpha = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
-
-		_classCallCheck(this, ColorSet);
-
-		this.grey = 61;
-		this.colors = [[this.grey, this.grey, this.grey], [255, 59, 48], [90, 200, 250], [255, 149, 0], [0, 122, 255], [255, 204, 0], [88, 86, 214], [76, 217, 100], [255, 45, 85]];
-		this.alpha = null;
-		if (alpha) {
-			this.alpha = 1.6;
-		}
-	}
-
-	_createClass(ColorSet, [{
-		key: 'rotate',
-		value: function rotate() {
-			var _this = this;
-
-			var c = this.colors.shift();
-			this.colors.push(c);
-			if (this.alpha === null) {
-				return;
-			}
-			var circle = c.every(function (value) {
-				return value === _this.grey;
-			});
-			if (circle) {
-				this.alpha = this.alpha * 0.625;
-			}
-		}
-	}, {
-		key: 'getColor_array',
-		value: function getColor_array() {
-			this.rotate();
-			if (this.alpha === null) {
-				return this.colors[0].slice();
-			}
-			return this.colors[0].slice().push(this.alpha);
-		}
-	}, {
-		key: 'getColor_rgba',
-		value: function getColor_rgba() {
-			this.rotate();
-			var c = this.colors[0].map(function (x) {
-				return x.toString();
-			}).join(',');
-			if (this.alpha === null) {
-				return 'rgba(' + c + ',1)';
-			}
-			return 'rgba(' + c + ',' + this.alpha.toFixed(3) + ')';
-		}
-	}]);
-
-	return ColorSet;
-}();
-
-exports.default = ColorSet;
-
-/***/ }),
-/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -447,6 +294,164 @@ function FilterItem(props) {
 }
 
 /***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+var myState = {
+	InitState: function InitState() {
+		return {
+			url: 'state',
+			database: [],
+			directoryMetadata: {
+				name: null,
+				textCount: 0,
+				deep: 0,
+				tags: null
+			},
+			query: null,
+			result: null
+		};
+	},
+	PageState: function PageState(url) {
+		return {
+			url: url,
+			query: selector(url, queryMap),
+			result: selector(url, resultMap)
+		};
+	}
+};
+exports.default = myState;
+
+var queryMap = {
+	frequency: function frequency() {
+		return {
+			typing: '',
+			done: new Set(),
+			filters: []
+		};
+	},
+	context: function context() {
+		return {
+			typing: '',
+			filters: []
+		};
+	},
+	cooccurrence: function cooccurrence() {
+		return {
+			term1: '',
+			term2: '',
+			filters: []
+		};
+	}
+};
+var resultMap = {
+	frequency: function frequency() {
+		return {
+			totals: {},
+			drawData: []
+		};
+	},
+	context: function context() {
+		return {
+			term: '',
+			table: null,
+			blob: null
+		};
+	},
+	cooccurrence: function cooccurrence() {
+		return {
+			rows: []
+		};
+	}
+};
+function selector(url, dict) {
+	if (!(url in dict)) {
+		return null;
+	}
+	return dict[url]();
+}
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var ColorSet = function () {
+	function ColorSet() {
+		var alpha = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+
+		_classCallCheck(this, ColorSet);
+
+		this.grey = 61;
+		this.colors = [[this.grey, this.grey, this.grey], [255, 59, 48], [90, 200, 250], [255, 149, 0], [0, 122, 255], [255, 204, 0], [88, 86, 214], [76, 217, 100], [255, 45, 85]];
+		this.alpha = null;
+		if (alpha) {
+			this.alpha = 1.6;
+		}
+	}
+
+	_createClass(ColorSet, [{
+		key: 'rotate',
+		value: function rotate() {
+			var _this = this;
+
+			var c = this.colors.shift();
+			this.colors.push(c);
+			if (this.alpha === null) {
+				return;
+			}
+			var circle = c.every(function (value) {
+				return value === _this.grey;
+			});
+			if (circle) {
+				this.alpha = this.alpha * 0.625;
+			}
+		}
+	}, {
+		key: 'getColor_array',
+		value: function getColor_array() {
+			this.rotate();
+			if (this.alpha === null) {
+				return this.colors[0].slice();
+			}
+			return this.colors[0].slice().push(this.alpha);
+		}
+	}, {
+		key: 'getColor_rgba',
+		value: function getColor_rgba() {
+			this.rotate();
+			var c = this.colors[0].map(function (x) {
+				return x.toString();
+			}).join(',');
+			if (this.alpha === null) {
+				return 'rgba(' + c + ',1)';
+			}
+			return 'rgba(' + c + ',' + this.alpha.toFixed(3) + ')';
+		}
+	}]);
+
+	return ColorSet;
+}();
+
+exports.default = ColorSet;
+
+/***/ }),
 /* 6 */
 /***/ (function(module, exports) {
 
@@ -462,7 +467,7 @@ module.exports = reactChartjs2;
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
-var my_events = ['PageChange', 'InputDirChange', 'AddFilter', 'RemoveFilter', 'FilterExcludeChange', 'FilterEqualChange', 'FilterValueChange', 'FilterKeyChange', 'FiltersApply', 'FrequencyTyping', 'FrequencySubmit', 'FrequencyRemove', 'ContextTyping', 'ContextSubmit', 'ShiftToSpan', 'CooccurrenceTyping'];
+var my_events = ['PageChange', 'InputDirChange', 'AddFilter', 'RemoveFilter', 'FilterExcludeChange', 'FilterEqualChange', 'FilterValueChange', 'FilterKeyChange', 'FiltersApply', 'FrequencyTyping', 'FrequencySubmit', 'FrequencyRemove', 'ContextTyping', 'ContextSubmit', 'ShiftToSpan', 'CooccurrenceTyping', 'CooccurrenceSubmit'];
 
 function getActions(dispatcher) {
 	var obj = new Object();
@@ -599,11 +604,11 @@ var _MenuView = __webpack_require__(21);
 
 var _MenuView2 = _interopRequireDefault(_MenuView);
 
-var _StatePage = __webpack_require__(25);
+var _StatePage = __webpack_require__(26);
 
 var _StatePage2 = _interopRequireDefault(_StatePage);
 
-var _FrequencyPage = __webpack_require__(24);
+var _FrequencyPage = __webpack_require__(25);
 
 var _FrequencyPage2 = _interopRequireDefault(_FrequencyPage);
 
@@ -611,7 +616,7 @@ var _ContextPage = __webpack_require__(23);
 
 var _ContextPage2 = _interopRequireDefault(_ContextPage);
 
-var _CooccurrencePage = __webpack_require__(33);
+var _CooccurrencePage = __webpack_require__(24);
 
 var _CooccurrencePage2 = _interopRequireDefault(_CooccurrencePage);
 
@@ -968,6 +973,15 @@ var CooccurrenceStore = {
 			query.term2 = payload.value;
 		}
 		setState({ query: query });
+	},
+	CooccurrenceSubmit: function CooccurrenceSubmit(payload, state, setState) {
+		var query = state.query;
+		var result = state.result;
+		result.rows = [];
+		state.database.forEach(function (text, i) {
+			Array.prototype.push.apply(result.rows, text.cooccurrences(query.term1, query.term2, 56));
+		});
+		setState({ result: result });
 	}
 };
 exports.default = CooccurrenceStore;
@@ -1033,7 +1047,7 @@ var _mixin = __webpack_require__(1);
 
 var _mixin2 = _interopRequireDefault(_mixin);
 
-var _colorSet = __webpack_require__(4);
+var _colorSet = __webpack_require__(5);
 
 var _colorSet2 = _interopRequireDefault(_colorSet);
 
@@ -1288,7 +1302,7 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _States = __webpack_require__(3);
+var _States = __webpack_require__(4);
 
 var _States2 = _interopRequireDefault(_States);
 
@@ -1492,17 +1506,38 @@ var TextEntity = function () {
 			};
 		}
 	}, {
-		key: "occurrences",
-		value: function occurrences(term1, term2, window_size) {
-			//this.text.indexOf(substring, start)
-			var start_index = 0;
-			while (true) {
-				var one = this.text.indexOf(term1, start_index);
-				var two = this.text.indexOf(term2, start_index);
-				if (one === -1 || two === -1) {
-					break;
+		key: "cooccurrences",
+		value: function cooccurrences(term1, term2, window_size) {
+			var _this = this;
+
+			var index_1 = this.text.indexOf(term1, 0);
+			var index_2 = this.text.indexOf(term2, 0);
+			var array = [];
+			while (index_1 !== -1) {
+				array.push(index_1);
+				index_1 = this.text.indexOf(term1, index_1 + 1);
+			}
+			var iter = 0,
+			    indexes = [];
+			var window_size_diff_2 = window_size - term2.length;
+			var window_size_diff_1 = window_size - term1.length;
+			while (index_2 !== -1 && iter < array.length) {
+				if (index_2 > array[iter]) {
+					if (window_size_diff_2 >= index_2 - array[iter]) {
+						indexes.push(parseInt((index_2 + term2.length + array[iter]) / 2));
+					}
+					++iter;
+				} else {
+					if (window_size_diff_1 >= array[iter] - index_2) {
+						indexes.push(parseInt((index_2 + term1.length + array[iter]) / 2));
+					}
+					index_2 = this.text.indexOf(term2, index_2 + 1);
 				}
 			}
+			var helf_window_size = parseInt(window_size / 2);
+			return indexes.map(function (index) {
+				return _this.text.substring(index - helf_window_size, index + helf_window_size);
+			});
 		}
 	}]);
 
@@ -1625,7 +1660,7 @@ var _exportComponent = __webpack_require__(2);
 
 var _exportComponent2 = _interopRequireDefault(_exportComponent);
 
-var _filterComponent = __webpack_require__(5);
+var _filterComponent = __webpack_require__(3);
 
 var _filterComponent2 = _interopRequireDefault(_filterComponent);
 
@@ -1789,13 +1824,97 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
+var _exportComponent = __webpack_require__(2);
+
+var _exportComponent2 = _interopRequireDefault(_exportComponent);
+
+var _filterComponent = __webpack_require__(3);
+
+var _filterComponent2 = _interopRequireDefault(_filterComponent);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function CooccurrencePage(props) {
+	return _react2.default.createElement(
+		'div',
+		null,
+		_react2.default.createElement(InputArea, props),
+		_react2.default.createElement(
+			'div',
+			null,
+			props.state.result.rows.map(function (row) {
+				return _react2.default.createElement(
+					'p',
+					null,
+					row
+				);
+			})
+		)
+	);
+}
+exports.default = CooccurrencePage;
+
+
+function InputArea(props) {
+	var onChange1 = function onChange1(e) {
+		props.actions.CooccurrenceTyping({
+			index: '1',
+			value: e.target.value
+		});
+	};
+	var onChange2 = function onChange2(e) {
+		props.actions.CooccurrenceTyping({
+			index: '2',
+			value: e.target.value
+		});
+	};
+	return _react2.default.createElement(
+		'div',
+		null,
+		_react2.default.createElement('input', {
+			type: 'text',
+			placeholder: '\u8F38\u5165\u8A5E\u5F59\u4E00',
+			onChange: onChange1,
+			value: props.state.query.term1
+		}),
+		_react2.default.createElement('input', {
+			type: 'text',
+			placeholder: '\u8F38\u5165\u8A5E\u5F59\u4E8C',
+			onChange: onChange2,
+			value: props.state.query.term2
+		}),
+		_react2.default.createElement(
+			'button',
+			{
+				onClick: props.actions.CooccurrenceSubmit
+			},
+			'\u78BA\u5B9A'
+		)
+	);
+}
+
+/***/ }),
+/* 25 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
 var _reactChartjs = __webpack_require__(6);
 
 var _exportComponent = __webpack_require__(2);
 
 var _exportComponent2 = _interopRequireDefault(_exportComponent);
 
-var _filterComponent = __webpack_require__(5);
+var _filterComponent = __webpack_require__(3);
 
 var _filterComponent2 = _interopRequireDefault(_filterComponent);
 
@@ -1993,7 +2112,7 @@ function InputArea(props) {
 }
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2009,7 +2128,7 @@ var _react2 = _interopRequireDefault(_react);
 
 var _reactChartjs = __webpack_require__(6);
 
-var _colorSet = __webpack_require__(4);
+var _colorSet = __webpack_require__(5);
 
 var _colorSet2 = _interopRequireDefault(_colorSet);
 
@@ -2146,7 +2265,7 @@ function DirectoryMetadata(props) {
 }
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2164,7 +2283,7 @@ var _reactDom = __webpack_require__(11);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
-var _States = __webpack_require__(3);
+var _States = __webpack_require__(4);
 
 var _States2 = _interopRequireDefault(_States);
 
@@ -2216,83 +2335,6 @@ var AppContainer = function (_React$Component) {
 }(_react2.default.Component);
 
 _reactDom2.default.render(_react2.default.createElement(AppContainer, null), document.getElementById('app'));
-
-/***/ }),
-/* 27 */,
-/* 28 */,
-/* 29 */,
-/* 30 */,
-/* 31 */,
-/* 32 */,
-/* 33 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _react = __webpack_require__(0);
-
-var _react2 = _interopRequireDefault(_react);
-
-var _exportComponent = __webpack_require__(2);
-
-var _exportComponent2 = _interopRequireDefault(_exportComponent);
-
-var _filterComponent = __webpack_require__(5);
-
-var _filterComponent2 = _interopRequireDefault(_filterComponent);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function CooccurrencePage(props) {
-	return _react2.default.createElement(
-		'div',
-		null,
-		_react2.default.createElement(InputArea, props)
-	);
-}
-exports.default = CooccurrencePage;
-
-
-function InputArea(props) {
-	var onChange1 = function onChange1(e) {
-		props.actions.CooccurrenceTyping({
-			index: '1',
-			value: e.target.value
-		});
-	};
-	var onChange2 = function onChange2(e) {
-		props.actions.CooccurrenceTyping({
-			index: '2',
-			value: e.target.value
-		});
-	};
-	return _react2.default.createElement(
-		'div',
-		null,
-		_react2.default.createElement('input', {
-			type: 'text',
-			placeholder: '\u8F38\u5165\u8A5E\u5F59\u4E00',
-			onChange: onChange1,
-			value: props.state.query.term1
-		}),
-		_react2.default.createElement('input', {
-			type: 'text',
-			placeholder: '\u8F38\u5165\u8A5E\u5F59\u4E8C',
-			onChange: onChange2,
-			value: props.state.query.term2
-		}),
-		_react2.default.createElement(
-			'button',
-			null,
-			'\u78BA\u5B9A'
-		)
-	);
-}
 
 /***/ })
 /******/ ]);

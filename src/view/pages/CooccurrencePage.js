@@ -5,6 +5,11 @@ import FilterComponent from '../components/filter-component';
 function CooccurrencePage(props){
 	return(<div>
 		<InputArea {...props} />
+		<div>
+			{props.state.result.rows.map(function(row){
+				return(<p>{row}</p>);
+			})}
+		</div>
 	</div>);
 }
 export default CooccurrencePage;
@@ -32,6 +37,7 @@ function InputArea(props){
 			value={props.state.query.term2} 
 		/>
 		<button
+			onClick={props.actions.CooccurrenceSubmit}
 		>確定</button>
 	</div>);
 }
