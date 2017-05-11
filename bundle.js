@@ -990,21 +990,31 @@ var CooccurrenceStore = {
 		if (term1.length === 0 || term2.length === 0 || term1 === term2) {
 			return;
 		}
-		var tmp = get_content(state.database, term1, term2, query.range);
+		var tmp = get_content(state.database, term1, term2, query.range, query.filters);
 		result.dataSet = tmp.result;
 		result.sum = tmp.sum;
 		result.blob = toHtmlBlob(result.dataSet);
 		setState({ result: result });
+	},
+	FiltersApply: function FiltersApply(payload, state, setState) {
+		CooccurrenceStore.CooccurrenceSubmit(payload, state, setState);
 	}
 };
 exports.default = CooccurrenceStore;
 
 
-function get_content(database, term1, term2, window_size) {
+function get_content(database, term1, term2, window_size, filters) {
 	var window_args = [window_size - term1.length, window_size - term2.length];
 	var counter = 0,
 	    result = [];
 	database.forEach(function (text, i) {
+		var tags = text.metadata.tags;
+		var pass = filters.every(function (f) {
+			return f.passFilter(tags[f.key]);
+		});
+		if (!pass) {
+			return;
+		}
 		var ans = text.cooccurrences(term1, term2, {
 			window_size_diff_1: window_args[0],
 			window_size_diff_2: window_args[1]
