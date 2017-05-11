@@ -40,6 +40,7 @@ const queryMap = {
 		return {
 			term1: '',
 			term2: '',
+			range: 30,
 			filters: []
 		}
 	}
@@ -60,7 +61,8 @@ const resultMap = {
 	},
 	cooccurrence: function(){
 		return {
-			rows: []
+			dataSet: [],
+			sum: 0
 		}
 	}
 };

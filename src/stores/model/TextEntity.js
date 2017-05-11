@@ -24,7 +24,7 @@ class TextEntity{
 			text: text.replace(new RegExp(string, 'g'), function(x){return '<em>'+x+'</em>'})
 		};
 	}
-	cooccurrences(term1, term2, window_size){
+	cooccurrences(term1, term2, window_args){
 		let index_1 = this.text.indexOf(term1, 0);
 		let index_2 = this.text.indexOf(term2, 0);
 		let array = [];
@@ -33,8 +33,8 @@ class TextEntity{
 			index_1 = this.text.indexOf(term1, index_1+1);
 		}
 		let iter = 0, indexes = [];
-		let window_size_diff_2 = window_size - term2.length;
-		let window_size_diff_1 = window_size - term1.length;
+		let window_size_diff_2 = window_args['window_size_diff_2'];
+		let window_size_diff_1 = window_args['window_size_diff_1'];
 		while(index_2 !== -1 && iter < array.length){
 			if(index_2 > array[iter]){
 				if(window_size_diff_2 >= index_2 - array[iter]){
@@ -49,9 +49,12 @@ class TextEntity{
 				index_2 = this.text.indexOf(term2, index_2+1);
 			}
 		}
-		let helf_window_size = parseInt(window_size/2);
 		return indexes.map((index) => {
-			return this.text.substring(index-helf_window_size, index+helf_window_size);
+			let target = this.text.substring(index-28, index+28);
+			target = MixinMethods.escapeHtml(target);
+			target = target.replace(new RegExp(term1, 'g'), function(x){return '<em>'+x+'</em>'});
+			target = target.replace(new RegExp(term2, 'g'), function(x){return '<em>'+x+'</em>'});
+			return target;
 		});
 	}
 }

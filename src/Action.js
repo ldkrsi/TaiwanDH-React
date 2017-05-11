@@ -3,7 +3,7 @@ const my_events = [
 	'AddFilter', 'RemoveFilter', 'FilterExcludeChange', 'FilterEqualChange', 'FilterValueChange', 'FilterKeyChange', 'FiltersApply',
 	'FrequencyTyping', 'FrequencySubmit', 'FrequencyRemove',
 	'ContextTyping', 'ContextSubmit', 'ShiftToSpan',
-	'CooccurrenceTyping', 'CooccurrenceSubmit'
+	'CooccurrenceTyping', 'CooccurrenceSubmit', 'CooccurrenceChangeRange'
 ];
 
 function getActions(dispatcher){

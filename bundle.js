@@ -346,6 +346,7 @@ var queryMap = {
 		return {
 			term1: '',
 			term2: '',
+			range: 30,
 			filters: []
 		};
 	}
@@ -366,7 +367,8 @@ var resultMap = {
 	},
 	cooccurrence: function cooccurrence() {
 		return {
-			rows: []
+			dataSet: [],
+			sum: 0
 		};
 	}
 };
@@ -467,7 +469,7 @@ module.exports = reactChartjs2;
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
-var my_events = ['PageChange', 'InputDirChange', 'AddFilter', 'RemoveFilter', 'FilterExcludeChange', 'FilterEqualChange', 'FilterValueChange', 'FilterKeyChange', 'FiltersApply', 'FrequencyTyping', 'FrequencySubmit', 'FrequencyRemove', 'ContextTyping', 'ContextSubmit', 'ShiftToSpan', 'CooccurrenceTyping', 'CooccurrenceSubmit'];
+var my_events = ['PageChange', 'InputDirChange', 'AddFilter', 'RemoveFilter', 'FilterExcludeChange', 'FilterEqualChange', 'FilterValueChange', 'FilterKeyChange', 'FiltersApply', 'FrequencyTyping', 'FrequencySubmit', 'FrequencyRemove', 'ContextTyping', 'ContextSubmit', 'ShiftToSpan', 'CooccurrenceTyping', 'CooccurrenceSubmit', 'CooccurrenceChangeRange'];
 
 function getActions(dispatcher) {
 	var obj = new Object();
@@ -974,17 +976,51 @@ var CooccurrenceStore = {
 		}
 		setState({ query: query });
 	},
-	CooccurrenceSubmit: function CooccurrenceSubmit(payload, state, setState) {
+	CooccurrenceChangeRange: function CooccurrenceChangeRange(payload, state, setState) {
 		var query = state.query;
-		var result = state.result;
-		result.rows = [];
-		state.database.forEach(function (text, i) {
-			Array.prototype.push.apply(result.rows, text.cooccurrences(query.term1, query.term2, 56));
-		});
+		query.range = payload;
+		setState({ query: query });
+	},
+	CooccurrenceSubmit: function CooccurrenceSubmit(payload, state, setState) {
+		var query = state.query,
+		    result = state.result;
+		var term1 = query.term1.trim(),
+		    term2 = query.term2.trim();
+		if (term1.length === 0 || term2.length === 0 || term1 === term2) {
+			return;
+		}
+		var tmp = get_content(state.database, term1, term2, query.range);
+		result.dataSet = tmp.result;
+		result.sum = tmp.sum;
 		setState({ result: result });
 	}
 };
 exports.default = CooccurrenceStore;
+
+
+function get_content(database, term1, term2, window_size) {
+	var window_args = [window_size - term1.length, window_size - term2.length];
+	var counter = 0,
+	    result = [];
+	database.forEach(function (text, i) {
+		var ans = text.cooccurrences(term1, term2, {
+			window_size_diff_1: window_args[0],
+			window_size_diff_2: window_args[1]
+		});
+		if (ans.length === 0) {
+			return;
+		}
+		counter += ans.length;
+		result.push({
+			filename: text.metadata.relativePath,
+			contents: ans
+		});
+	});
+	return {
+		sum: counter,
+		result: result
+	};
+}
 
 /***/ }),
 /* 15 */
@@ -1507,7 +1543,7 @@ var TextEntity = function () {
 		}
 	}, {
 		key: "cooccurrences",
-		value: function cooccurrences(term1, term2, window_size) {
+		value: function cooccurrences(term1, term2, window_args) {
 			var _this = this;
 
 			var index_1 = this.text.indexOf(term1, 0);
@@ -1519,8 +1555,8 @@ var TextEntity = function () {
 			}
 			var iter = 0,
 			    indexes = [];
-			var window_size_diff_2 = window_size - term2.length;
-			var window_size_diff_1 = window_size - term1.length;
+			var window_size_diff_2 = window_args['window_size_diff_2'];
+			var window_size_diff_1 = window_args['window_size_diff_1'];
 			while (index_2 !== -1 && iter < array.length) {
 				if (index_2 > array[iter]) {
 					if (window_size_diff_2 >= index_2 - array[iter]) {
@@ -1534,9 +1570,16 @@ var TextEntity = function () {
 					index_2 = this.text.indexOf(term2, index_2 + 1);
 				}
 			}
-			var helf_window_size = parseInt(window_size / 2);
 			return indexes.map(function (index) {
-				return _this.text.substring(index - helf_window_size, index + helf_window_size);
+				var target = _this.text.substring(index - 28, index + 28);
+				target = _mixin2.default.escapeHtml(target);
+				target = target.replace(new RegExp(term1, 'g'), function (x) {
+					return '<em>' + x + '</em>';
+				});
+				target = target.replace(new RegExp(term2, 'g'), function (x) {
+					return '<em>' + x + '</em>';
+				});
+				return target;
 			});
 		}
 	}]);
@@ -1835,25 +1878,50 @@ var _filterComponent2 = _interopRequireDefault(_filterComponent);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function CooccurrencePage(props) {
+	var state = props.state;
+	var filter = _react2.default.createElement(_filterComponent2.default, {
+		filters: state.query.filters,
+		tags: state.directoryMetadata.tags,
+		actions: props.actions
+	});
 	return _react2.default.createElement(
 		'div',
 		null,
 		_react2.default.createElement(InputArea, props),
-		_react2.default.createElement(
-			'div',
+		filter,
+		state.result.sum > 0 ? _react2.default.createElement(
+			'p',
 			null,
-			props.state.result.rows.map(function (row) {
-				return _react2.default.createElement(
-					'p',
-					null,
-					row
-				);
-			})
-		)
+			'\u5169\u8005\u7E3D\u5171\u5171\u73FE',
+			state.result.sum,
+			'\u6B21'
+		) : '',
+		_react2.default.createElement(ShowItems, { dataSet: state.result.dataSet })
 	);
 }
 exports.default = CooccurrencePage;
 
+
+function ShowItems(props) {
+	return _react2.default.createElement(
+		'div',
+		{ className: 'cooccurrences-table' },
+		props.dataSet.map(function (item) {
+			return _react2.default.createElement(
+				'div',
+				{ className: 'row' },
+				_react2.default.createElement(
+					'h3',
+					null,
+					item.filename
+				),
+				item.contents.map(function (row) {
+					return _react2.default.createElement('p', { dangerouslySetInnerHTML: { __html: row } });
+				})
+			);
+		})
+	);
+}
 
 function InputArea(props) {
 	var onChange1 = function onChange1(e) {
@@ -1867,6 +1935,9 @@ function InputArea(props) {
 			index: '2',
 			value: e.target.value
 		});
+	};
+	var onChangeRange = function onChangeRange(e) {
+		props.actions.CooccurrenceChangeRange(e.target.value);
 	};
 	return _react2.default.createElement(
 		'div',
@@ -1883,6 +1954,20 @@ function InputArea(props) {
 			onChange: onChange2,
 			value: props.state.query.term2
 		}),
+		_react2.default.createElement('br', null),
+		_react2.default.createElement('br', null),
+		_react2.default.createElement(
+			'p',
+			null,
+			'\u7BC4\u570D\uFF1A',
+			props.state.query.range,
+			'\u500B\u5B57'
+		),
+		_react2.default.createElement('input', { type: 'range', min: '2', max: '56',
+			onChange: onChangeRange,
+			value: props.state.query.range
+		}),
+		_react2.default.createElement('br', null),
 		_react2.default.createElement(
 			'button',
 			{
