@@ -12,9 +12,10 @@ function CooccurrencePage(props){
 	return(<div>
 		<InputArea {...props} />
 		{filter}
-		{state.result.sum > 0 ? 
+		{state.result.sum > 0 ? <div>
 			<p>兩者總共共現{state.result.sum}次</p>
-		: ''}
+			<ExportComponent name={'共現分析.html'} text="點此匯出下方資料(html)" blobObject={state.result.blob} />
+		</div>: ''}
 		<ShowItems dataSet={state.result.dataSet} />
 	</div>);
 }

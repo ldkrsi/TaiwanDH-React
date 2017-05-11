@@ -368,7 +368,8 @@ var resultMap = {
 	cooccurrence: function cooccurrence() {
 		return {
 			dataSet: [],
-			sum: 0
+			sum: 0,
+			blog: null
 		};
 	}
 };
@@ -992,6 +993,7 @@ var CooccurrenceStore = {
 		var tmp = get_content(state.database, term1, term2, query.range);
 		result.dataSet = tmp.result;
 		result.sum = tmp.sum;
+		result.blob = toHtmlBlob(result.dataSet);
 		setState({ result: result });
 	}
 };
@@ -1020,6 +1022,22 @@ function get_content(database, term1, term2, window_size) {
 		sum: counter,
 		result: result
 	};
+}
+function toHtmlBlob(dataSet) {
+	var result = '\uFEFF';
+	dataSet.forEach(function (row) {
+		result += '<div>';
+		result += '<h2>';
+		result += row.filename;
+		result += '</h2><div>';
+		row.contents.forEach(function (line) {
+			result += '<p>';
+			result += line;
+			result += '</p>';
+		});
+		result += '</div></div>';
+	});
+	return new Blob([result], { type: 'text/html' });
 }
 
 /***/ }),
@@ -1890,11 +1908,16 @@ function CooccurrencePage(props) {
 		_react2.default.createElement(InputArea, props),
 		filter,
 		state.result.sum > 0 ? _react2.default.createElement(
-			'p',
+			'div',
 			null,
-			'\u5169\u8005\u7E3D\u5171\u5171\u73FE',
-			state.result.sum,
-			'\u6B21'
+			_react2.default.createElement(
+				'p',
+				null,
+				'\u5169\u8005\u7E3D\u5171\u5171\u73FE',
+				state.result.sum,
+				'\u6B21'
+			),
+			_react2.default.createElement(_exportComponent2.default, { name: '共現分析.html', text: '\u9EDE\u6B64\u532F\u51FA\u4E0B\u65B9\u8CC7\u6599(html)', blobObject: state.result.blob })
 		) : '',
 		_react2.default.createElement(ShowItems, { dataSet: state.result.dataSet })
 	);

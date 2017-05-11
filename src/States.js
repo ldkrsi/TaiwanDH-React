@@ -62,7 +62,8 @@ const resultMap = {
 	cooccurrence: function(){
 		return {
 			dataSet: [],
-			sum: 0
+			sum: 0,
+			blog: null
 		}
 	}
 };

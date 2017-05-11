@@ -23,6 +23,7 @@ const CooccurrenceStore = {
 		let tmp = get_content(state.database, term1, term2, query.range);
 		result.dataSet = tmp.result;
 		result.sum = tmp.sum;
+		result.blob = toHtmlBlob(result.dataSet);
 		setState({result: result});
 	}
 };
@@ -49,4 +50,20 @@ function get_content(database, term1, term2, window_size){
 		sum: counter,
 		result: result
 	};
+}
+function toHtmlBlob(dataSet){
+	let result = '\uFEFF';
+	dataSet.forEach(function(row){
+		result += '<div>';
+		result += '<h2>';
+		result += row.filename;
+		result += '</h2><div>';
+		row.contents.forEach(function(line){
+			result += '<p>';
+			result += line;
+			result += '</p>';
+		});
+		result += '</div></div>';
+	});
+	return new Blob([result], {type: 'text/html'});
 }
